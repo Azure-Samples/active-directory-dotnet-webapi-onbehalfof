@@ -32,6 +32,7 @@ using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using System.Web;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using System.Threading;
 
 namespace TodoListService.Controllers
 {
@@ -131,15 +132,41 @@ namespace TodoListService.Controllers
             UserAssertion userAssertion = new UserAssertion(userAccessToken);
 
             string authority = String.Format(CultureInfo.InvariantCulture, aadInstance, tenant);
+            // ADAL has a default in-memory cache that is used for all AcquireToken calls (but not with AcquireTokenWith* calls).
+            // This sample uses the in-memory cache, which has limited effectiveness if there are multiple instances of the TodoListService (e.g. a farm).
+            // You can also implement your own cache for access tokens and refresh tokens by storing them separately, for example in a database.
+            // If you wish to do that, use the AuthenticationContext constructor that passes null for the token cache.
+            // AuthenticationContext authContext = new AuthenticationContext(authority, null);
             AuthenticationContext authContext = new AuthenticationContext(authority);
-            try
+
+            // In the case of a transient error, retry once after 1 second, then abandon.
+            // Retrying is optional.  It may be better, for your application, to return an error immediately to the user and have the user initiate the retry.
+            bool retry = false;
+            int retryCount = 0;
+
+            do
             {
-                result = authContext.AcquireToken(graphResourceId, userAssertion, clientCred);
-                accessToken = result.AccessToken;
-            }
-            catch
+                retry = false;
+                try
+                {
+                    result = authContext.AcquireToken(graphResourceId, userAssertion, clientCred);
+                    accessToken = result.AccessToken;
+                }
+                catch (ActiveDirectoryAuthenticationException ex)
+                {
+                    if (ex.ErrorCode == "temporarily_unavailable")
+                    {
+                        // Transient error, OK to retry.
+                        retry = true;
+                        retryCount++;
+                        Thread.Sleep(1000);
+                    }
+                }
+            } while ((retry == true) && (retryCount < 1));
+
+            if (accessToken == null)
             {
-                // An unexpected error occurred.  Return a null profile.
+                // An unexpected error occurred.
                 return (null);
             }
 
