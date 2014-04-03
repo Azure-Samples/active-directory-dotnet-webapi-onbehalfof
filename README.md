@@ -111,7 +111,9 @@ Coming soon.
 
 ### Step 6:  Run the sample
 
-You know what to do!  Explore the sample by signing in, adding items to the To Do list, removing the user account, and starting again.  The To Do list service will take the user's access token, received from the client, and use it to get another access token so it can act On Behalf Of the user in the Graph API.  This sample does not cache the user's access token at the To Do list service, so it requests a new access token on every request.  The service could cache the access token in a database, for example, for better performance, and it could cache the refresh token so that it could obtain access tokens for the user even when the user is not present.
+Clean the solution, rebuild the solution, and run it.  You might want to go into the solution properties and set both projects as startup projects, with the service project starting first.
+
+Explore the sample by signing in, adding items to the To Do list, removing the user account, and starting again.  The To Do list service will take the user's access token, received from the client, and use it to get another access token so it can act On Behalf Of the user in the Graph API.  This sample does not cache the user's access token at the To Do list service, so it requests a new access token on every request.  The service could cache the access token in a database, for example, for better performance, and it could cache the refresh token so that it could obtain access tokens for the user even when the user is not present.
 
 ## How To Deploy This Sample to Azure
 
