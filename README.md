@@ -69,6 +69,8 @@ There are two projects in this sample.  Each needs to be separately registered i
 ],
 ```
 
+NOTE:  In this sample, the TodoListService makes a delegated identity call to the Graph API to read the user's profile.  By default, when the TodoListService is registered with Active Directory, it is configured to request this permission in the "Permissions to Other Applications" configuration section.  If you modify the TodoListService to call a different API, or if you build your own service that makes an On Behalf Of call, the service it calls and the permissions it requires must be added to the "Permissions to Other Applications" configuration in Azure AD.s
+
 #### Register the TodoListClient app
 
 1. Sign in to the [Azure management portal](https://manage.windowsazure.com).
@@ -160,7 +162,7 @@ First, in Visual Studio 2013 create an empty solution to host the  projects.  Th
 ### Creating the TodoListService Project
 
 1. In the solution, create a new ASP.Net MVC web API project called TodoListService and while creating the project, click the Change Authentication button, select Organizational Accounts, Cloud - Single Organization, enter the name of your Azure AD tenant, and set the Access Level to Single Sign On.  You will be prompted to sign-in to your Azure AD tenant.  NOTE:  You must sign-in with a user that is in the tenant; you cannot, during this step, sign-in with a Microsoft account.
-2. Add the pre-release Active Directory Authentication Library (ADAL) NuGet, Microsoft.IdentityModel.Clients.ActiveDirectory, version 2.6.0-alpha (or higher), to the project.
+2. Add the pre-release Active Directory Authentication Library (ADAL) NuGet, Microsoft.IdentityModel.Clients.ActiveDirectory, version 2.6.1-alpha (or higher), to the project.
 3. In the `Models` folder add a new class called `TodoItem.cs`.  Copy the implementation of TodoItem from this sample into the class.
 4. In the `Models` folder add a new class called `UserProfile.cs`.  Copy the implementation of UserProfile from this sample into the class.
 5. Add a new, empty, Web API 2 controller called `TodoListController`.
