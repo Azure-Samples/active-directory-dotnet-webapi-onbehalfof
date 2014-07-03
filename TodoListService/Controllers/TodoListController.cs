@@ -34,6 +34,7 @@ using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using System.Threading;
 
+
 namespace TodoListService.Controllers
 {
     [Authorize]
@@ -126,9 +127,8 @@ namespace TodoListService.Controllers
             //      The credentials of this application.
             //
             ClientCredential clientCred = new ClientCredential(clientId, appKey);
-            string authHeader = HttpContext.Current.Request.Headers["Authorization"];
-            // The header is of the form "bearer <accesstoken>", so extract to the right of the whitespace to find the access token.
-            string userAccessToken = authHeader.Substring(authHeader.LastIndexOf(' ')).Trim();
+            var bootstrapContext = ClaimsPrincipal.Current.Identities.First().BootstrapContext as System.IdentityModel.Tokens.BootstrapContext;
+            string userAccessToken = bootstrapContext.Token;
             UserAssertion userAssertion = new UserAssertion(userAccessToken);
 
             string authority = String.Format(CultureInfo.InvariantCulture, aadInstance, tenant);
@@ -149,10 +149,10 @@ namespace TodoListService.Controllers
                 retry = false;
                 try
                 {
-                    result = authContext.AcquireToken(graphResourceId, userAssertion, clientCred);
+                    result = authContext.AcquireToken(graphResourceId, clientCred, userAssertion);
                     accessToken = result.AccessToken;
                 }
-                catch (ActiveDirectoryAuthenticationException ex)
+                catch (AdalException ex)
                 {
                     if (ex.ErrorCode == "temporarily_unavailable")
                     {
