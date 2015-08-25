@@ -33,6 +33,7 @@ using System.Web;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using System.Threading;
+using TodoListService.DAL;
 
 
 namespace TodoListService.Controllers
@@ -63,7 +64,8 @@ namespace TodoListService.Controllers
         //
         // To Do items list for all users.  Since the list is stored in memory, it will go away if the service is cycled.
         //
-        static ConcurrentBag<TodoItem> todoBag = new ConcurrentBag<TodoItem>();
+        private TodoListServiceContext db = new TodoListServiceContext();
+
 
         // GET api/todolist
         public IEnumerable<TodoItem> Get()
@@ -72,7 +74,7 @@ namespace TodoListService.Controllers
             // The Scope claim tells you what permissions the client application has in the service.
             // In this case we look for a scope value of user_impersonation, or full access to the service as the user.
             //
-            if (ClaimsPrincipal.Current.FindFirst("http://schemas.microsoft.com/identity/claims/scope").Value != "user_impersonation")
+            if (!ClaimsPrincipal.Current.FindFirst("http://schemas.microsoft.com/identity/claims/scope").Value.Contains("user_impersonation"))
             {
                 throw new HttpResponseException(new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized, ReasonPhrase = "The Scope claim does not contain 'user_impersonation' or scope claim not found" });
             }
@@ -80,7 +82,7 @@ namespace TodoListService.Controllers
             // A user's To Do list is keyed off of the NameIdentifier claim, which contains an immutable, unique identifier for the user.
             Claim subject = ClaimsPrincipal.Current.FindFirst(ClaimTypes.NameIdentifier);
 
-            return from todo in todoBag
+            return from todo in db.TodoItems
                    where todo.Owner == subject.Value
                    select todo;
         }
@@ -88,7 +90,7 @@ namespace TodoListService.Controllers
         // POST api/todolist
         public async Task Post(TodoItem todo)
         {
-            if (ClaimsPrincipal.Current.FindFirst("http://schemas.microsoft.com/identity/claims/scope").Value != "user_impersonation")
+            if (!ClaimsPrincipal.Current.FindFirst("http://schemas.microsoft.com/identity/claims/scope").Value.Contains("user_impersonation"))
             {
                 throw new HttpResponseException(new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized, ReasonPhrase = "The Scope claim does not contain 'user_impersonation' or scope claim not found" });
             }
@@ -110,7 +112,8 @@ namespace TodoListService.Controllers
 
             if (null != todo && !string.IsNullOrWhiteSpace(todo.Title))
             {
-                todoBag.Add(new TodoItem { Title = augmentedTitle, Owner = ClaimsPrincipal.Current.FindFirst(ClaimTypes.NameIdentifier).Value });
+                db.TodoItems.Add(new TodoItem { Title = augmentedTitle, Owner = ClaimsPrincipal.Current.FindFirst(ClaimTypes.NameIdentifier).Value });
+                db.SaveChanges();
             }
         }
 
@@ -125,19 +128,17 @@ namespace TodoListService.Controllers
             //      The Resource ID of the service we want to call.
             //      The current user's access token, from the current request's authorization header.
             //      The credentials of this application.
+            //      The username (UPN or email) of the user calling the API
             //
             ClientCredential clientCred = new ClientCredential(clientId, appKey);
             var bootstrapContext = ClaimsPrincipal.Current.Identities.First().BootstrapContext as System.IdentityModel.Tokens.BootstrapContext;
+            string userName = ClaimsPrincipal.Current.FindFirst(ClaimTypes.Upn) != null ? ClaimsPrincipal.Current.FindFirst(ClaimTypes.Upn).Value : ClaimsPrincipal.Current.FindFirst(ClaimTypes.Email).Value;
             string userAccessToken = bootstrapContext.Token;
-            UserAssertion userAssertion = new UserAssertion(userAccessToken);
+            UserAssertion userAssertion = new UserAssertion(bootstrapContext.Token, "urn:ietf:params:oauth:grant-type:jwt-bearer", userName);
 
             string authority = String.Format(CultureInfo.InvariantCulture, aadInstance, tenant);
-            // ADAL has a default in-memory cache that is used for all AcquireToken calls (but not with AcquireTokenWith* calls).
-            // This sample uses the in-memory cache, which has limited effectiveness if there are multiple instances of the TodoListService (e.g. a farm).
-            // You can also implement your own cache for access tokens and refresh tokens by storing them separately, for example in a database.
-            // If you wish to do that, use the AuthenticationContext constructor that passes null for the token cache.
-            // AuthenticationContext authContext = new AuthenticationContext(authority, null);
-            AuthenticationContext authContext = new AuthenticationContext(authority);
+            string userId = ClaimsPrincipal.Current.FindFirst(ClaimTypes.NameIdentifier).Value;
+            AuthenticationContext authContext = new AuthenticationContext(authority, new DbTokenCache(userId));
 
             // In the case of a transient error, retry once after 1 second, then abandon.
             // Retrying is optional.  It may be better, for your application, to return an error immediately to the user and have the user initiate the retry.
