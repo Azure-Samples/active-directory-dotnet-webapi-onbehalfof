@@ -1,3 +1,9 @@
+---
+services:
+platforms:
+author: azure
+---
+
 WebAPI-OnBehalfOf-DotNet
 ========================
 
