@@ -1,11 +1,10 @@
 ---
-services:
-platforms:
-author: azure
+services: active-directory
+platforms: dotnet
+author: dstrockis
 ---
 
 Calling a downstream web API from a web API using Azure AD
-========================
 
 In this sample, native client calls a web API and then the web API calls another downstream web API after obtaining a token to act On Behalf Of the original user.  The sample uses the Active Directory Authentication Library (ADAL) in the native client to obtain a token for the user to call the first web API, and also in the first web API to get a token to act on behalf of the user to call the second web API.  Both flows use the OAuth 2.0 protocol to obtain the tokens.
 
@@ -18,13 +17,13 @@ To run this sample you will need:
 - An Internet connection
 - An Azure subscription (a free trial is sufficient)
 
-Every Azure subscription has an associated Azure Active Directory tenant.  If you don't already have an Azure subscription, you can get a free subscription by signing up at [http://wwww.windowsazure.com](http://www.windowsazure.com).  All of the Azure AD features used by this sample are available free of charge.
+Every Azure subscription has an associated Azure Active Directory tenant.  If you don't already have an Azure subscription, you can get a free subscription by signing up at [https://azure.microsoft.com](https://azure.microsoft.com).  All of the Azure AD features used by this sample are available free of charge.
 
 ### Step 1:  Clone or download this repository
 
 From your shell or command line:
 
-`git clone https://github.com/AzureADSamples/WebAPI-OnBehalfOf-DotNet.git`
+`git clone https://github.com/Azure-Samples/active-directory-dotnet-webapi-onbehalfof.git`
 
 ### Step 2:  Create a user account in your Azure Active Directory tenant
 
