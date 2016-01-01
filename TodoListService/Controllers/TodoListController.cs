@@ -150,7 +150,7 @@ namespace TodoListService.Controllers
                 retry = false;
                 try
                 {
-                    result = authContext.AcquireToken(graphResourceId, clientCred, userAssertion);
+                    result = await authContext.AcquireTokenAsync(graphResourceId, clientCred, userAssertion);
                     accessToken = result.AccessToken;
                 }
                 catch (AdalException ex)
