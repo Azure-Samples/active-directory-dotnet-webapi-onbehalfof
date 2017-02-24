@@ -54,6 +54,14 @@ NOTE:  In this sample, the TodoListService makes a delegated identity call to th
 7. Find the Application ID value and copy it to the clipboard.
 8. Configure Permissions for your application - in the Settings menu, choose the 'Required permissions' section, click on **Add**, then **Select an API**, and type 'TodoListService' in the textbox. Then, click on  **Select Permissions** and select 'Access TodoListService'.
 
+#### Configure known client applications
+For the middle tier web API to be able to call the downstream web API, the user must grant the middle tier permission to do so in the form of consent.  Because the middle tier has no interactive UI of its own, you need to explicitly bind the client app registration in Azure AD with the registration for the web API, which merges the consent required by both the client & middle tier into a single dialog. You can do so by adding the "Client ID" of the client app, to the manifest of the web API in the `knownClientApplications` property. Here's how:
+
+1. Navigate to your 'TodoListService' app registration, and open the manifest editor.
+2. In the manifest, locate the `knownClientApplications` array property, and add the Client ID of your client application as an element.  Your code should look like the following after you're done:
+    `"knownClientApplications": ["94da0930-763f-45c7-8d26-04d5938baab2"]`
+3. Save the TodoListService manifest by clicking the "Save" button.
+
 ### Step 3:  Configure the sample to use your Azure AD tenant
 
 #### Configure the TodoListService project
