@@ -1,7 +1,7 @@
 ---
 services: active-directory
 platforms: dotnet
-author: dstrockis
+author: jmprieur
 ---
 
 # Calling a downstream web API from a web API using Azure AD
