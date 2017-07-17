@@ -196,6 +196,8 @@ so that they are consistent with the Applications parameters
     $tenantName =  $tenant.VerifiedDomains[0].Name
 
     . .\Config.ps1
+
+    $appKey = ComputePassword
    
 	# Create the TodoListService Active Directory Application and it's service principal
     Write-Host "Creating the AAD appplication ($todoListServiceWebApiName)"
