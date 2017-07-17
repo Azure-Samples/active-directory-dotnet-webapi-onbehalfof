@@ -66,6 +66,8 @@ namespace TodoListService.Controllers
         //
         private TodoListServiceContext db = new TodoListServiceContext();
 
+        // Error Constants
+        const String SERVICE_UNAVAILABLE = "temporarily_unavailable";
 
         // GET api/todolist
         public IEnumerable<TodoItem> Get()
@@ -155,7 +157,7 @@ namespace TodoListService.Controllers
                 }
                 catch (AdalException ex)
                 {
-                    if (ex.ErrorCode == "temporarily_unavailable")
+                    if (ex.ErrorCode == SERVICE_UNAVAILABLE)
                     {
                         // Transient error, OK to retry.
                         retry = true;
