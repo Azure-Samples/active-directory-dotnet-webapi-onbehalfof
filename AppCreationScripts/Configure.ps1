@@ -63,6 +63,47 @@ Function UpdateTodoListClientConfigFile([string] $configFilePath, [string] $tena
     ReplaceSetting -configFilePath $configFilePath -key "todo:TodoListBaseAddress" -newValue $baseAddress
 }
 
+Function UpateLine([string] $line, [string] $value)
+{
+	$index = $line.IndexOf(':')
+	if ($index -ige 0)
+	{
+		$line = $line.Substring(0, $index) + """"+$value + ""","
+	}
+}
+
+Function UpdateTodoListSPAClientConfig([string] $configFilePath, [string] $tenantId, [string] $clientId, [string] $redirectUri, [string] $resourceId, [string] $baseAddress)
+{
+	$lines = Get-Content $configFilePath
+	$index = 0
+	while($index -lt $lines.Length)
+	{
+		$line = $lines[$index]
+		if ($lines.Contains("tenant:"))
+		{
+			$lines[$index] = UpdateLine($line, $tenantId)
+		}
+		if ($lines.Contains("clientId:"))
+		{
+			$lines[$index] = UpdateLine($line, $clientId)
+		}
+		if ($lines.Contains("redirectUri:"))
+		{
+			$lines[$index] = UpdateLine($line, $redirectUri)
+		}
+		if ($lines.Contains("resourceId:"))
+		{
+			$lines[$index] = UpdateLine($line, $resourceId)
+		}
+		if ($lines.Contains("resourceBaseAddress:"))
+		{
+			$lines[$index] = UpdateLine($line, $resourceId)
+		}
+		$index++
+	}
+	
+	Set-Content -Path $configFilePath+".back" -Value $lines
+}
 
 # Adds the requiredAccesses (expressed as a pipe separated string) to the requiredAccess structure
 # The exposed permissions are in the $exposedPermissions collection, and the type of permission (Scope | Role) is 
@@ -231,6 +272,21 @@ so that they are consistent with the Applications parameters
     Set-AzureADApplication -ObjectId $todoListServiceWebApiAadApplication.ObjectId -KnownClientApplications $todoListClientAadApplication.AppId
 	Write-Host "Configured."
  
+
+	# Create the TodoListSPAClient Active Directory Application and it's service principal 
+    Write-Host "Creating the AAD appplication ($todoListSPAClientName) and requesting access to '$todoListServiceWebApiName'"
+    $todoListSPAClientAadApplication = New-AzureADApplication -DisplayName $todoListSPAClientName `
+											 -Homepage $todoListSPAClientRedirectUri `
+                                             -ReplyUrls $todoListSPAClientRedirectUri `
+                                             -PublicClient $todoListSPAClientIsPublicClient `
+											 -RequiredResourceAccess $requiredResourcesAccess `
+	                                         -IdentifierUris $todoListSPAClientAppIdURI `
+											 -Oauth2AllowImplicitFlow $true
+	$todoListSPAClientServicePrincipal = New-AzureADServicePrincipal -AppId $todoListSPAClientAadApplication.AppId
+	Write-Host "Created."
+
+
+
     # Update the config files in the application
     $configFile = $pwd.Path + "\..\TodoListService\Web.Config"
     Write-Host "Updating the sample code ($configFile)"
@@ -249,6 +305,15 @@ so that they are consistent with the Applications parameters
                             -baseAddress $todoListServiceWebApiBaseUrl `
 	                        -resourceId $todoListServiceWebApiAppIdURI
 
+    $configFile = $pwd.Path + "\..\TodoListSPA\appconfig.js"
+    Write-Host "Updating the sample code ($configFile)"
+	UpdateTodoListSPAClientConfig -configFilePath $configFile `
+								  -tenantId $tenantName `
+								  -clientId $todoListSPAClientAadApplication.AppId `
+								  -redirectUri $todoListSPAClientRedirectUri `
+	                              -resourceId $todoListServiceWebApiAppIdURI `
+								  -baseAddress $todoListServiceWebApiAppIdURI
+	   
     # Completes
     Write-Host "Done."
    }

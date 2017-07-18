@@ -42,7 +42,7 @@ function onLogin(error, user) {
 
 
 function acquireTokenAndCallService() {
-    authenticationContext.acquireTokenPopup("https://msidentitysamplestesting.onmicrosoft.com/TodoListService", null, null, onAccessToken);
+    authenticationContext.acquireTokenPopup(webApiConfig.resourceId, null, null, onAccessToken);
 }
 
 function onAccessToken(errorDesc, token, error) {
@@ -50,7 +50,7 @@ function onAccessToken(errorDesc, token, error) {
         showError("acquireToken", error);
     }
     if (token) {
-        callServiceWithToken(token, "http://localhost:9184/api/todolist");
+        callServiceWithToken(token, webApiConfig.resourceBaseAddress+"api/todolist");
     }
 }
 

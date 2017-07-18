@@ -82,6 +82,13 @@ This function removes the Azure AD applications for the sample. These applicatio
         Remove-AzureADApplication -ObjectId $app.ObjectId
     }
 
+	$app=Get-AzureADApplication -Filter "DisplayName eq '$todoListSPAClientName'"  
+    if ($app)
+    {
+        Write-Host "Removing Application '$todoListSPAClientName'"
+        Remove-AzureADApplication -ObjectId $app.ObjectId
+    }
+
 
     Write-Host "Done."
    }
