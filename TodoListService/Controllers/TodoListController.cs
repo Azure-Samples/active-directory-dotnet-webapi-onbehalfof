@@ -34,11 +34,13 @@ using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using System.Threading;
 using TodoListService.DAL;
-
+using System.Web.Http.Cors;
 
 namespace TodoListService.Controllers
 {
-    [Authorize]
+   [Authorize]
+   [EnableCors(origins: "*", headers: "*", methods: "*")]
+
     public class TodoListController : ApiController
     {
         //

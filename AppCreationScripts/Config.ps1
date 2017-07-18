@@ -8,7 +8,7 @@
 	# App ID URI, is https://<your_tenant_name>/TodoListService
 	$todoListServiceWebApiName = "TodoListService"
 	$todoListServiceWebApiIsPublicClient = $false
-	$todoListServiceWebApiBaseUrl= "https://localhost:44321"
+	$todoListServiceWebApiBaseUrl= "http://localhost:9184/"
     $todoListServiceWebApiAppIdURI = "https://$tenantName/$todoListServiceWebApiName"
 
 # Registeration for the TodoListClien app
