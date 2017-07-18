@@ -42,7 +42,17 @@ function onLogin(error, user) {
 
 
 function acquireTokenAndCallService() {
-    authenticationContext.acquireTokenPopup(webApiConfig.resourceId, null, null, onAccessToken);
+    authenticationContext.acquireToken(webApiConfig.resourceId, function (errorDesc, token, error)
+    {
+        if (error)
+        {
+            authenticationContext.acquireTokenPopup(webApiConfig.resourceId, null, null, onAccessToken);
+        }
+        else
+        {
+            onAccessToken(errorDesc, token, error);
+        }
+    })
 }
 
 function onAccessToken(errorDesc, token, error) {
