@@ -63,13 +63,14 @@ Function UpdateTodoListClientConfigFile([string] $configFilePath, [string] $tena
     ReplaceSetting -configFilePath $configFilePath -key "todo:TodoListBaseAddress" -newValue $baseAddress
 }
 
-Function UpateLine([string] $line, [string] $value)
+Function UpdateLine([string] $line, [string] $value)
 {
 	$index = $line.IndexOf(':')
 	if ($index -ige 0)
 	{
-		$line = $line.Substring(0, $index) + """"+$value + ""","
+		$line = $line.Substring(0, $index+1) + " """+$value + ""","
 	}
+	return $line
 }
 
 Function UpdateTodoListSPAClientConfig([string] $configFilePath, [string] $tenantId, [string] $clientId, [string] $redirectUri, [string] $resourceId, [string] $baseAddress)
@@ -79,30 +80,30 @@ Function UpdateTodoListSPAClientConfig([string] $configFilePath, [string] $tenan
 	while($index -lt $lines.Length)
 	{
 		$line = $lines[$index]
-		if ($lines.Contains("tenant:"))
+		if ($line.Contains("tenant:"))
 		{
-			$lines[$index] = UpdateLine($line, $tenantId)
+			$lines[$index] = UpdateLine $line $tenantId
 		}
-		if ($lines.Contains("clientId:"))
+		if ($line.Contains("clientId:"))
 		{
-			$lines[$index] = UpdateLine($line, $clientId)
+			$lines[$index] = UpdateLine $line $clientId
 		}
-		if ($lines.Contains("redirectUri:"))
+		if ($line.Contains("redirectUri:"))
 		{
-			$lines[$index] = UpdateLine($line, $redirectUri)
+			$lines[$index] = UpdateLine $line $redirectUri
 		}
-		if ($lines.Contains("resourceId:"))
+		if ($line.Contains("resourceId:"))
 		{
-			$lines[$index] = UpdateLine($line, $resourceId)
+			$lines[$index] = UpdateLine $line $resourceId
 		}
-		if ($lines.Contains("resourceBaseAddress:"))
+		if ($line.Contains("resourceBaseAddress:"))
 		{
-			$lines[$index] = UpdateLine($line, $resourceId)
+			$lines[$index] = UpdateLine $line $baseAddress
 		}
 		$index++
 	}
 	
-	Set-Content -Path $configFilePath+".back" -Value $lines
+	Set-Content -Path $configFilePath -Value $lines -Force
 }
 
 # Adds the requiredAccesses (expressed as a pipe separated string) to the requiredAccess structure
@@ -312,7 +313,7 @@ so that they are consistent with the Applications parameters
 								  -clientId $todoListSPAClientAadApplication.AppId `
 								  -redirectUri $todoListSPAClientRedirectUri `
 	                              -resourceId $todoListServiceWebApiAppIdURI `
-								  -baseAddress $todoListServiceWebApiAppIdURI
+								  -baseAddress $todoListServiceWebApiBaseUrl
 	   
     # Completes
     Write-Host "Done."
