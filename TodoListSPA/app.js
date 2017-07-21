@@ -3,25 +3,22 @@
 config.callback = loggedin;
 var authenticationContext = new AuthenticationContext(config);
 
-if (authenticationContext.isCallback(window.location.hash)) {
-    authenticationContext.handleWindowCallback();
-}
-else {
-    var user = authenticationContext.getCachedUser();
-    if (user && window.parent === window && !window.opener) {
+if (!config.popUp) {
+    if (authenticationContext.isCallback(window.location.hash)) {
+        authenticationContext.handleWindowCallback();
+    }
+    else {
+        var user = authenticationContext.getCachedUser();
+        if (user && window.parent === window && !window.opener) {
+            // Display the user
+            displayUserAndShowSignOutButton(user);
 
-        // Show the user info.
-        var userInfoElement = document.getElementById("userInfo");
-        userInfoElement.parentElement.classList.remove("hidden");
-        userInfoElement.innerHTML = JSON.stringify(user, null, 4);
-
-        // Show the Sign-Out button
-        document.getElementById("signOutButton").classList.remove("hidden");
-
-        // Call the protected API to show the content of the todo list
-        acquireTokenAndCallService();
+            // Call the protected API to show the content of the todo list
+            acquireTokenAndCallService();
+        }
     }
 }
+
 
 function displayTodoList() {
     authenticationContext.login();
@@ -42,6 +39,17 @@ function loggedin(errorDescription, idToken, error) {
     }
 }
 
+
+function displayUserAndShowSignOutButton(user) {
+    // Show the user info.
+    var userInfoElement = document.getElementById("userInfo");
+    userInfoElement.parentElement.classList.remove("hidden");
+    userInfoElement.innerHTML = JSON.stringify(user, null, 4);
+
+    // Show the Sign-Out button
+    document.getElementById("signOutButton").classList.remove("hidden");
+}
+
 /**
  * Function called when the user is logged-in
  * @param {string} error - Error from the STS
@@ -50,12 +58,7 @@ function loggedin(errorDescription, idToken, error) {
 function onLogin(error, user) {
     if (user) {
         // Show the information about the user
-        var userInfoElement = document.getElementById("userInfo");
-        userInfoElement.parentElement.classList.remove("hidden");
-        userInfoElement.innerHTML = JSON.stringify(user, null, 4);
-
-        // Show the Sign-Out button
-        document.getElementById("signOutButton").classList.remove("hidden");
+        displayUserAndShowSignOutButton(user)
 
         // Call the protected API to show the content of the todo list
         acquireTokenAndCallService();
