@@ -6,7 +6,7 @@ author: jmprieur
 
 # Calling a downstream web API from a web API using Azure AD
 
-In this sample, native client calls and a simple JavaScript simple page application call a web API and then the web API calls another downstream web API after obtaining a token to act On Behalf Of the original user.  The sample uses the Active Directory Authentication Library (ADAL.Net) in the native client to obtain a token for the user to call the first web API, and also in the first web API to get a token to act on behalf of the user to call the second web API.  Both flows use the OAuth 2.0 protocol to obtain the tokens. the Single page application uses ADAL.Js
+In this sample, the native client and simple JavaScript single page application call a web API which then calls another downstream web API after obtaining a token to act On Behalf Of the original user.  The sample uses the Active Directory Authentication Library (ADAL.NET) in the native client to obtain a token for the user to call the first web API.  It then uses ADAL.NET in the first web API to get a token to act on behalf of the user to call the second downstream web API.  Both flows use the OAuth 2.0 protocol to obtain the tokens. the single page application uses ADAL.js
 
 For more information about how the protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](http://go.microsoft.com/fwlink/?LinkId=394414).
 
