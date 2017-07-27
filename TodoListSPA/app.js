@@ -14,13 +14,14 @@ if (!config.popUp) {
             displayUserAndShowSignOutButton(user);
 
             // Call the protected API to show the content of the todo list
-            acquireTokenAndCallService();
+            acquireAnAccessTokenAndCallTheProtectedService();
         }
     }
 }
 
 
 function displayTodoList() {
+    showProgress("Getting user's identity");
     authenticationContext.login();
 }
 
@@ -61,7 +62,7 @@ function onLogin(error, user) {
         displayUserAndShowSignOutButton(user)
 
         // Call the protected API to show the content of the todo list
-        acquireTokenAndCallService();
+        acquireAnAccessTokenAndCallTheProtectedService();
     }
     if (error) {
         showError("login", error);
@@ -71,7 +72,8 @@ function onLogin(error, user) {
 /**
  * Acquire an access token and call the Web API
  */
-function acquireTokenAndCallService() {
+function acquireAnAccessTokenAndCallTheProtectedService() {
+    showProgress("acquiring an access token for the Web API");
     authenticationContext.acquireToken(webApiConfig.resourceId, function (errorDesc, token, error) {
         if (error) {
             if (config.popUp) {
@@ -98,6 +100,7 @@ function onAccessToken(errorDesc, token, error) {
         showError("acquireToken", error);
     }
     if (token) {
+        showProgress("calling the Web API with the access token");
         callServiceWithToken(token, webApiConfig.resourceBaseAddress + "api/todolist");
     }
 }
@@ -122,11 +125,30 @@ function callServiceWithToken(token, endpoint) {
     fetch(endpoint, options)
         .then(function (response) {
             var contentType = response.headers.get("content-type");
+            // Case where we got the content from the API
             if (response.status === 200 && contentType && contentType.indexOf("application/json") !== -1) {
                 response.json()
                     .then(function (data) {
                         // Display response in the page
+                        showProgress("");
                         showAPIResponse(data, token);
+                    })
+                    .catch(function (error) {
+                        showError(endpoint, error);
+                    });
+            } else if (response.status === 403 && contentType && contentType.indexOf("text/plain; charset=utf-8") !== -1) {
+                // Case where the TotoListService requests that the user presents additional claims (Claim Challenge)
+                response.text()
+                    .then(function (data) {
+                        // Display response in the page
+                        showProgress("Requires additional claims: " + data);
+                        var claims = data;
+                        if (config.popUp) {
+                            authenticationContext.acquireTokenPopup(webApiConfig.resourceId, null, claims, onAccessToken);
+                        }
+                        else {
+                            authenticationContext.acquireTokenRedirect(webApiConfig.resourceId, null, claims);
+                        }
                     })
                     .catch(function (error) {
                         showError(endpoint, error);
@@ -172,4 +194,14 @@ function showError(endpoint, error) {
         formattedError = error;
     }
     errorElement.innerHTML = "Error calling " + endpoint + ": " + formattedError;
+}
+
+
+/**
+ * Show an a text in the page explaining the progress
+ * @param {string} text- the text to display
+ */
+function showProgress(text) {
+    var errorElement = document.getElementById("progressMessage");
+    errorElement.innerText = text;
 }

@@ -247,7 +247,7 @@ so that they are consistent with the Applications parameters
                                              -HomePage $todoListServiceWebApiBaseUrl `
                                              -IdentifierUris $todoListServiceWebApiAppIdURI `
                                              -PublicClient $todoListServiceWebApiIsPublicClient
-	$todoListServiceWebApiServicePrincipal = New-AzureADServicePrincipal -AppId $todoListServiceWebApiAadApplication.AppId
+	$todoListServiceWebApiServicePrincipal = New-AzureADServicePrincipal -AppId $todoListServiceWebApiAadApplication.AppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
 	Write-Host "Created."
 
 	# Create the TodoListClient Active Directory Application and it's service principal 
@@ -256,7 +256,7 @@ so that they are consistent with the Applications parameters
                                              -ReplyUrls $todoListClientRedirectUri `
                                              -PublicClient $todoListClientIsPublicClient `
 											 -RequiredResourceAccess $requiredResourcesAccess
-	$todoListClientServicePrincipal = New-AzureADServicePrincipal -AppId $todoListClientAadApplication.AppId
+	$todoListClientServicePrincipal = New-AzureADServicePrincipal -AppId $todoListClientAadApplication.AppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
 	Write-Host "Created."
 
     # Add Required Resources Access (from 'TodoListClient' to 'TodoListService')
@@ -283,7 +283,7 @@ so that they are consistent with the Applications parameters
 											 -RequiredResourceAccess $requiredResourcesAccess `
 	                                         -IdentifierUris $todoListSPAClientAppIdURI `
 											 -Oauth2AllowImplicitFlow $true
-	$todoListSPAClientServicePrincipal = New-AzureADServicePrincipal -AppId $todoListSPAClientAadApplication.AppId
+	$todoListSPAClientServicePrincipal = New-AzureADServicePrincipal -AppId $todoListSPAClientAadApplication.AppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
 	Write-Host "Created."
 
 

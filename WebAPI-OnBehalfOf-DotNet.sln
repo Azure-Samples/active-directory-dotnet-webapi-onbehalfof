@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListService", "TodoList
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListClient", "TodoListClient\TodoListClient.csproj", "{005E6BB1-F422-4366-B548-1BDE150F0073}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Automation", "Automation", "{3E633205-9B5D-400F-91BD-CEA90736AC38}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppCreationScripts", "AppCreationScripts", "{3E633205-9B5D-400F-91BD-CEA90736AC38}"
 	ProjectSection(SolutionItems) = preProject
 		AppCreationScripts\Cleanup.ps1 = AppCreationScripts\Cleanup.ps1
 		AppCreationScripts\Config.ps1 = AppCreationScripts\Config.ps1
