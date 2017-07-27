@@ -17,9 +17,8 @@ namespace TodoListService
             app.UseWindowsAzureActiveDirectoryBearerAuthentication(
                 new WindowsAzureActiveDirectoryBearerAuthenticationOptions
                 {
-                    Audience = ConfigurationManager.AppSettings["ida:Audience"],
                     Tenant = ConfigurationManager.AppSettings["ida:Tenant"],
-                    TokenValidationParameters = new TokenValidationParameters{ SaveSigninToken = true }
+                    TokenValidationParameters = new TokenValidationParameters{ SaveSigninToken = true, ValidAudience= ConfigurationManager.AppSettings["ida:Audience"] }
                 });
         }
     }

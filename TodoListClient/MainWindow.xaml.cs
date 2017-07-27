@@ -76,7 +76,7 @@ namespace TodoListClient
             InitializeLogin();
         }
 
-        private async void InitializeLogin()
+        private async Task InitializeLogin()
         {
             //
             // As the application starts, try to get an access token without prompting the user.  If one exists, populate the To Do list.  If not, continue.
@@ -85,11 +85,11 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await authContext.AcquireTokenAsync(todoListResourceId, clientId, redirectUri, new PlatformParameters(PromptBehavior.Never));
+                result = await authContext.AcquireTokenSilentAsync(todoListResourceId, clientId);
 
                 // A valid token is in the cache - get the To Do list.
                 SignInButton.Content = "Clear Cache";
-                GetTodoList();
+                await GetTodoList();
             }
             catch (AdalException ex)
             {
@@ -111,7 +111,7 @@ namespace TodoListClient
             }
         }
 
-        private async void GetTodoList()
+        private async Task GetTodoList()
         {
             //
             // Get an access token to call the To Do service.
@@ -119,7 +119,7 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await authContext.AcquireTokenAsync(todoListResourceId, clientId, redirectUri, new PlatformParameters(PromptBehavior.Never));
+                result = await authContext.AcquireTokenSilentAsync(todoListResourceId, clientId);
             }
             catch (AdalException ex)
             {
@@ -181,7 +181,7 @@ namespace TodoListClient
             AuthenticationResult result = null;
             try
             {
-                result = await authContext.AcquireTokenAsync(todoListResourceId, clientId, redirectUri, new PlatformParameters(PromptBehavior.Never));
+                result = await authContext.AcquireTokenSilentAsync(todoListResourceId, clientId);
             }
             catch (AdalException ex)
             {
@@ -222,9 +222,8 @@ namespace TodoListClient
             if (response.IsSuccessStatusCode)
             {
                 TodoText.Text = "";
-                GetTodoList();
-            }
-            else
+                await GetTodoList();
+            } else
             {
                 MessageBox.Show("An error occurred : " + response.ReasonPhrase);
             }
@@ -251,7 +250,7 @@ namespace TodoListClient
             {
                 result = await authContext.AcquireTokenAsync(todoListResourceId, clientId, redirectUri, new PlatformParameters(PromptBehavior.Always));
                 SignInButton.Content = "Clear Cache";
-                GetTodoList();
+                await GetTodoList();
             }
             catch (AdalException ex)
             {

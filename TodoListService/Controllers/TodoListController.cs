@@ -34,11 +34,13 @@ using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using System.Threading;
 using TodoListService.DAL;
-
+using System.Web.Http.Cors;
 
 namespace TodoListService.Controllers
 {
-    [Authorize]
+   [Authorize]
+   [EnableCors(origins: "*", headers: "*", methods: "*")]
+
     public class TodoListController : ApiController
     {
         //
@@ -66,6 +68,8 @@ namespace TodoListService.Controllers
         //
         private TodoListServiceContext db = new TodoListServiceContext();
 
+        // Error Constants
+        const String SERVICE_UNAVAILABLE = "temporarily_unavailable";
 
         // GET api/todolist
         public IEnumerable<TodoItem> Get()
@@ -155,7 +159,7 @@ namespace TodoListService.Controllers
                 }
                 catch (AdalException ex)
                 {
-                    if (ex.ErrorCode == "temporarily_unavailable")
+                    if (ex.ErrorCode == SERVICE_UNAVAILABLE)
                     {
                         // Transient error, OK to retry.
                         retry = true;
@@ -163,7 +167,7 @@ namespace TodoListService.Controllers
                         Thread.Sleep(1000);
                     }
                 }
-            } while ((retry == true) && (retryCount < 1));
+            } while ((retry == true) && (retryCount < 2));
 
             if (accessToken == null)
             {
