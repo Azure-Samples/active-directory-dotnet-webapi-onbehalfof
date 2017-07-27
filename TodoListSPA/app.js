@@ -20,15 +20,34 @@ if (!config.popUp) {
 }
 
 
+/**
+ * Entry point: called when the user clicks on the "Display the todo list" button
+ */
 function displayTodoList() {
-    showProgress("Getting user's identity");
-    authenticationContext.login();
+    var user = authenticationContext.getCachedUser();
+    if (user) {
+        onLogin(null, user);
+    }
+    else {
+        showProgress("Getting user's identity");
+        authenticationContext.login();
+    }
 }
 
+/**
+ * Entry point: called when the user clicks on the "Logout" button
+ */
 function signOut() {
     authenticationContext.logOut();
 }
 
+/**
+ * Callback, triggered after authentication.login() got called and the login interaction
+ * with the user happened.
+ * @param {string} errorDescription - Description of the error (as returned from the STS)
+ * @param {string} idToken - Id token in case of success
+ * @param {string} error - Error code
+ */
 function loggedin(errorDescription, idToken, error) {
     if (error) {
         showError(errorDescription, error);
@@ -37,10 +56,34 @@ function loggedin(errorDescription, idToken, error) {
         if (config.popUp) {
             authenticationContext.getUser(onLogin);
         }
+        // The other case (redirect) is processed in the section guarded by the 
+        // authenticationContext.isCallback(window.location.hash) condition (see above)
     }
 }
 
+/**
+ * Function called when the user is logged-in. It displays the information about the
+ * user, and calls the protected Web API to display the list of to do items
+ * @param {string} error - Error from the STS
+ * @param {any} user - Data about the logged-in user
+ */
+function onLogin(error, user) {
+    if (user) {
+        // Show the information about the user
+        displayUserAndShowSignOutButton(user);
 
+        // Call the protected API to show the content of the todo list
+        acquireAnAccessTokenAndCallTheProtectedService();
+    }
+    if (error) {
+        showError("login", error);
+    }
+}
+
+/**
+ * Displays information about the user and show the signout button
+ * @param {any} user - Data about the logged-in user
+ */
 function displayUserAndShowSignOutButton(user) {
     // Show the user info.
     var userInfoElement = document.getElementById("userInfo");
@@ -52,25 +95,9 @@ function displayUserAndShowSignOutButton(user) {
 }
 
 /**
- * Function called when the user is logged-in
- * @param {string} error - Error from the STS
- * @param {any} user - Data about the logged-in user
- */
-function onLogin(error, user) {
-    if (user) {
-        // Show the information about the user
-        displayUserAndShowSignOutButton(user)
-
-        // Call the protected API to show the content of the todo list
-        acquireAnAccessTokenAndCallTheProtectedService();
-    }
-    if (error) {
-        showError("login", error);
-    }
-}
-
-/**
- * Acquire an access token and call the Web API
+ * Acquire an access token and call the Web API.
+ * This tries to acquire token from the cache (acquireToken), and if this fails, this will try to
+ * acquire token with one of the UI-ed functions acquireTokenPopup or acquireTokenRedirect
  */
 function acquireAnAccessTokenAndCallTheProtectedService() {
     showProgress("acquiring an access token for the Web API");
@@ -86,11 +113,11 @@ function acquireAnAccessTokenAndCallTheProtectedService() {
         else {
             onAccessToken(errorDesc, token, error);
         }
-    })
+    });
 }
 
 /**
- * Function called when the access token is available
+ * Function called when the access token is available. This will call the service
  * @param {string} errorDesc - Error message
  * @param {string} token - Access token to use in the Web API
  * @param {string} error - Error code from the STS
@@ -105,9 +132,9 @@ function onAccessToken(errorDesc, token, error) {
     }
 }
 
-
 /**
- * Show an error message in the page
+ * Calls the service with the access token. Also handles the "claim challenge", that is when the service requires
+ * more claims from the users (for instance that the users does two factors authentication)
  * @param {string} token - Access token for the web API
  * @param {string} endpoint - endpoint to the Web API to call
  */
@@ -125,8 +152,8 @@ function callServiceWithToken(token, endpoint) {
     fetch(endpoint, options)
         .then(function (response) {
             var contentType = response.headers.get("content-type");
-            // Case where we got the content from the API
             if (response.status === 200 && contentType && contentType.indexOf("application/json") !== -1) {
+                // Case where we got the content from the API (as JSon)
                 response.json()
                     .then(function (data) {
                         // Display response in the page
@@ -137,7 +164,8 @@ function callServiceWithToken(token, endpoint) {
                         showError(endpoint, error);
                     });
             } else if (response.status === 403 && contentType && contentType.indexOf("text/plain; charset=utf-8") !== -1) {
-                // Case where the TotoListService requests that the user presents additional claims (Claim Challenge)
+                // Claim Challenge: Case where the TotoListService requests that the user presents additional claims, (for instance two factors authentication).
+                // We then need another round of UI interaction hence the calls to acquireTokenPopup or acquireTokenRedirect
                 response.text()
                     .then(function (data) {
                         // Display response in the page
@@ -154,6 +182,7 @@ function callServiceWithToken(token, endpoint) {
                         showError(endpoint, error);
                     });
             } else {
+                // Other cases than 202 with JSon content, or 403 with text content. We suppose this is some Json content.
                 response.json()
                     .then(function (data) {
                         // Display response in the page
@@ -196,10 +225,9 @@ function showError(endpoint, error) {
     errorElement.innerHTML = "Error calling " + endpoint + ": " + formattedError;
 }
 
-
 /**
  * Show an a text in the page explaining the progress
- * @param {string} text- the text to display
+ * @param {string} text - the text to display
  */
 function showProgress(text) {
     var errorElement = document.getElementById("progressMessage");
