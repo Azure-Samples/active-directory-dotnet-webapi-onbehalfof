@@ -183,7 +183,7 @@ function callServiceWithToken(token, endpoint) {
                     });
             } else {
                 // Other cases than 202 with JSon content, or 403 with text content. We suppose this is some Json content.
-                response.json()
+                response.text()
                     .then(function (data) {
                         // Display response in the page
                         showError(endpoint, data);
