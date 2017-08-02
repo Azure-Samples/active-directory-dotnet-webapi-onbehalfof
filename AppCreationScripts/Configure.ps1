@@ -260,6 +260,16 @@ so that they are consistent with the Applications parameters
 	                                        -Tags {WindowsAzureActiveDirectoryIntegratedApp}
 	Write-Host "Created."
 
+    # Add Required Resources Access (from 'TodoListService' to 'AAD Graph' as the service calls graph.windows.com)
+	Write-Host "Getting access from '$todoListServiceWebApiName' to 'AAD Graph'"
+	$requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
+    $graphApiRequiredPermissions = GetRequiredPermissions -applicationDisplayName "Windows Azure Active Directory" `
+                                                                 -requiredDelegatedPermissions "User.Read";
+    $requiredResourcesAccess.Add($graphApiRequiredPermissions)
+	Set-AzureADApplication -ObjectId $todoListServiceWebApiAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
+	Write-Host "Granted."
+
+
 	# Create the TodoListClient Active Directory Application and it's service principal 
     Write-Host "Creating the AAD appplication ($todoListClientName) and requesting access to '$todoListServiceWebApiName'"
     $todoListClientAadApplication = New-AzureADApplication -DisplayName $todoListClientName `
@@ -289,6 +299,10 @@ so that they are consistent with the Applications parameters
 											 -Oauth2AllowImplicitFlow $true
 	$todoListSPAClientServicePrincipal = New-AzureADServicePrincipal -AppId $todoListSPAClientAadApplication.AppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
 	Write-Host "Created."
+
+	Write-Host "Getting access from '$todoListSPAClientName' to '$todoListServiceWebApiName'"
+	Set-AzureADApplication -ObjectId $todoListSPAClientAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
+	Write-Host "Granted."
 
     # Configure TodoListClient and the SPA as a known client applications on the TodoListService
 	Write-Host "Configure '$todoListSPAClientName' and '$todoListClientName' as known client applications for the '$todoListServiceWebApiName'"
