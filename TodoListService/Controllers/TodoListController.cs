@@ -77,8 +77,8 @@ namespace TodoListService.Controllers
             //
             // The Scope claim tells you what permissions the client application has in the service.
             // In this case we look for a scope value of user_impersonation, or full access to the service as the user.
-            //
-            if (!ClaimsPrincipal.Current.FindFirst("http://schemas.microsoft.com/identity/claims/scope").Value.Contains("user_impersonation"))
+            var scopeClaim = ClaimsPrincipal.Current.FindFirst("http://schemas.microsoft.com/identity/claims/scope");
+            if (scopeClaim == null || !scopeClaim.Value.Contains("user_impersonation"))
             {
                 throw new HttpResponseException(new HttpResponseMessage { StatusCode = HttpStatusCode.Unauthorized, ReasonPhrase = "The Scope claim does not contain 'user_impersonation' or scope claim not found" });
             }
