@@ -174,11 +174,16 @@ Function ComputePassword
 
 # Create an application key
 # See https://www.sabin.io/blog/adding-an-azure-active-directory-application-and-key-using-powershell/
-Function CreateAppKey([DateTime] $fromDate, [int] $durationInYears, [string]$pw)
+Function CreateAppKey([DateTime] $fromDate, [double] $durationInYears, [string]$pw)
 {
     $endDate = $fromDate.AddYears($durationInYears) 
     $keyId = (New-Guid).ToString();
-    $key = New-Object Microsoft.Open.AzureAD.Model.PasswordCredential($null, $fromDate, $keyId, $endDate, $pw) 
+    $key = New-Object Microsoft.Open.AzureAD.Model.PasswordCredential
+	$key.StartDate = $fromDate
+	$key.EndDate = $endDate
+	$key.Value = $pw
+	$key.KeyId = $keyId
+	return $key
 }
 
 
@@ -238,17 +243,32 @@ so that they are consistent with the Applications parameters
     $tenantName =  $tenant.VerifiedDomains[0].Name
 
     . .\Config.ps1
-
-    $appKey = ComputePassword
    
+	# Get a 1 year application key for the Downstream Web API Application
+    $pw = ComputePassword
+    $fromDate = [DateTime]::Now
+    $key = CreateAppKey -fromDate $fromDate -durationInYears 2 -pw $pw
+    $appKey = $pw
 	# Create the TodoListService Active Directory Application and it's service principal
     Write-Host "Creating the AAD appplication ($todoListServiceWebApiName)"
     $todoListServiceWebApiAadApplication = New-AzureADApplication -DisplayName $todoListServiceWebApiName `
                                              -HomePage $todoListServiceWebApiBaseUrl `
                                              -IdentifierUris $todoListServiceWebApiAppIdURI `
+	   	                                     -PasswordCredentials $key `
                                              -PublicClient $todoListServiceWebApiIsPublicClient
-	$todoListServiceWebApiServicePrincipal = New-AzureADServicePrincipal -AppId $todoListServiceWebApiAadApplication.AppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
+	$todoListServiceWebApiServicePrincipal = New-AzureADServicePrincipal -AppId $todoListServiceWebApiAadApplication.AppId `
+	                                        -Tags {WindowsAzureActiveDirectoryIntegratedApp}
 	Write-Host "Created."
+
+    # Add Required Resources Access (from 'TodoListService' to 'AAD Graph' as the service calls graph.windows.com)
+	Write-Host "Getting access from '$todoListServiceWebApiName' to 'AAD Graph'"
+	$requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
+    $graphApiRequiredPermissions = GetRequiredPermissions -applicationDisplayName "Windows Azure Active Directory" `
+                                                                 -requiredDelegatedPermissions "User.Read";
+    $requiredResourcesAccess.Add($graphApiRequiredPermissions)
+	Set-AzureADApplication -ObjectId $todoListServiceWebApiAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
+	Write-Host "Granted."
+
 
 	# Create the TodoListClient Active Directory Application and it's service principal 
     Write-Host "Creating the AAD appplication ($todoListClientName) and requesting access to '$todoListServiceWebApiName'"
@@ -268,12 +288,6 @@ so that they are consistent with the Applications parameters
 	Set-AzureADApplication -ObjectId $todoListClientAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
 	Write-Host "Granted."
 
-    # Configure TodoListClient as a known client application on the TodoListService
-	Write-Host "Configure '$todoListClientName' as a known client application on the '$todoListServiceWebApiName'"
-    Set-AzureADApplication -ObjectId $todoListServiceWebApiAadApplication.ObjectId -KnownClientApplications $todoListClientAadApplication.AppId
-	Write-Host "Configured."
- 
-
 	# Create the TodoListSPAClient Active Directory Application and it's service principal 
     Write-Host "Creating the AAD appplication ($todoListSPAClientName) and requesting access to '$todoListServiceWebApiName'"
     $todoListSPAClientAadApplication = New-AzureADApplication -DisplayName $todoListSPAClientName `
@@ -286,8 +300,18 @@ so that they are consistent with the Applications parameters
 	$todoListSPAClientServicePrincipal = New-AzureADServicePrincipal -AppId $todoListSPAClientAadApplication.AppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
 	Write-Host "Created."
 
+	Write-Host "Getting access from '$todoListSPAClientName' to '$todoListServiceWebApiName'"
+	Set-AzureADApplication -ObjectId $todoListSPAClientAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
+	Write-Host "Granted."
 
-
+    # Configure TodoListClient and the SPA as a known client applications on the TodoListService
+	Write-Host "Configure '$todoListSPAClientName' and '$todoListClientName' as known client applications for the '$todoListServiceWebApiName'"
+	$knowApplications = New-Object System.Collections.Generic.List[System.String]
+	$knowApplications.Add($todoListSPAClientAadApplication.AppId)
+	$knowApplications.Add($todoListClientAadApplication.AppId)
+    Set-AzureADApplication -ObjectId $todoListServiceWebApiAadApplication.ObjectId -KnownClientApplications $knowApplications
+	Write-Host "Configured."
+ 
     # Update the config files in the application
     $configFile = $pwd.Path + "\..\TodoListService\Web.Config"
     Write-Host "Updating the sample code ($configFile)"

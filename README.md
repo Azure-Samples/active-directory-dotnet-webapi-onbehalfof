@@ -28,7 +28,9 @@ From your shell or command line:
 
 ### Step 2:  Register the sample with your Azure Active Directory tenant
 
-There are two projects in this sample.  Each needs to be separately registered in your Azure AD tenant.
+There are three projects in this sample.  Each needs to be separately registered in your Azure AD tenant.
+
+To register these projects you can  follow the steps in the paragraphs below. Alternatively you can use a PowerShell script which creates the Azure AD applications and related objects (passwords, permissions, dependencies) and modifies the project's configuration files for you. If you want to do use this automation read these instructions [App Creation Scripts](./AppCreationScripts.md)
 
 #### Register the TodoListService web API
 

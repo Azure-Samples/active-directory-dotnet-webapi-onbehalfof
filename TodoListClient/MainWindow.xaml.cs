@@ -91,6 +91,13 @@ namespace TodoListClient
                 SignInButton.Content = "Clear Cache";
                 await GetTodoList();
             }
+            catch (AdalSilentTokenAcquisitionException ex)
+            {
+                if (ex.ErrorCode == "failed_to_acquire_token_silently" && ex.Message.Contains("no token was found in the cache"))
+                {
+                    // There are no tokens in the cache.  Proceed without calling the To Do list service.
+                }
+            }
             catch (AdalException ex)
             {
                 if (ex.ErrorCode == "user_interaction_required")

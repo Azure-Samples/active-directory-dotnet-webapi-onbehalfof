@@ -6,6 +6,7 @@
 	# Apllication Type is 'Web Application and/or Web API' (private application). 
 	# For the sign-on URL, is the base URL for the sample, which is by default https://localhost:44321. 
 	# App ID URI, is https://<your_tenant_name>/TodoListService
+	# Add key of 1 or 2 years
 	$todoListServiceWebApiName = "TodoListService-OBO"
 	$todoListServiceWebApiIsPublicClient = $false
 	$todoListServiceWebApiBaseUrl= "http://localhost:9184/"
