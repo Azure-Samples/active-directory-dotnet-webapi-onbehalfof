@@ -21,7 +21,7 @@ From the folder where you cloned the repo,
 cd AppCreationScripts
 ```
 
-6. Run the script. See below for the [four options](#Four-ways-to-run-the-script) to do that.
+6. Run the script. See below for the [four options](#four-ways-to-run-the-script) to do that.
 7. Open the Visual Studio solution, and in the solution's context menu, choose **Set Startup Projects**. 
 8. select **Start** for the three projects
 
