@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListService", "TodoListService\TodoListService.csproj", "{047CDEF7-D5BA-4B1E-9748-910B610CCA51}"
 EndProject
@@ -9,8 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TodoListClient", "TodoListC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppCreationScripts", "AppCreationScripts", "{3E633205-9B5D-400F-91BD-CEA90736AC38}"
 	ProjectSection(SolutionItems) = preProject
+		AppCreationScripts\AppCreationScripts.md = AppCreationScripts\AppCreationScripts.md
 		AppCreationScripts\Cleanup.ps1 = AppCreationScripts\Cleanup.ps1
-		AppCreationScripts\Config.ps1 = AppCreationScripts\Config.ps1
 		AppCreationScripts\Configure.ps1 = AppCreationScripts\Configure.ps1
 	EndProjectSection
 EndProject
@@ -37,5 +37,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {59038DE5-5C6B-4D7C-AD24-8D6D4233E9BC}
 	EndGlobalSection
 EndGlobal
