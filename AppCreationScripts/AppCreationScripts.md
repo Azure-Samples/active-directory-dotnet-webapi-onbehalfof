@@ -11,19 +11,19 @@ To use the app creation scripts:
  Set-ExecutionPolicy -Scope Process -ExecutionPolicy Unrestricted
  ```
 4. If you have never done it already, in the PowerShell window, install the AzureAD PowerShell modules. For this, type:
-    ```
-    Install-Module AzureAD
-    ```
+ ```PowerShell
+ Install-Module AzureAD
+ ```
 
-5. Go to the `AppCreationScripts` sub-folder
-    From the folder where you cloned the repo, 
-    ```
-    cd AppCreationScripts
-    ```
+5. Go to the `AppCreationScripts` sub-folder. 
+From the folder where you cloned the repo, 
+```PowerShell
+cd AppCreationScripts
+```
 
 6. Run the script. See below for the [four options](#Four-ways-to-run-the-script) to do that.
 7. Open the Visual Studio solution, and in the solution's context menu, choose **Set Startup Projects**. 
-8. select "Start" for the 3 projects
+8. select **Start** for the three projects
 
 You're done. this just works!
 
@@ -37,13 +37,12 @@ Note that the script will choose the tenant in which to create the applications,
 
 ### Option 2 (non-interactive)
 When you know the credentials of the user under which identity you want to create the applications you can use the non-interactive approach. It's more adapted to DevOps. Here is an example of script you'd want to run in a PowerShell Window
-
-    ```PowerShell
-    $secpasswd = ConvertTo-SecureString "[Password here]" -AsPlainText -Force
-    $mycreds = New-Object System.Management.Automation.PSCredential ("[login@tenantName here]", $secpasswd)
-    . .\Cleanup.ps1 -Credential $mycreds
-    . .\Configure.ps1 -Credential $mycreds
-    ```
+```PowerShell
+$secpasswd = ConvertTo-SecureString "[Password here]" -AsPlainText -Force
+$mycreds = New-Object System.Management.Automation.PSCredential ("[login@tenantName here]", $secpasswd)
+. .\Cleanup.ps1 -Credential $mycreds
+. .\Configure.ps1 -Credential $mycreds
+```
 Of course, in real life, you will  also want to get the password from KeyVault
 
  ### Option 3 (Interactive, but create apps in a specified tenant)
@@ -53,18 +52,15 @@ Of course, in real life, you will  also want to get the password from KeyVault
 - Find the "Active Directory" object in this tenant
 - Go to **Properties** and copy the content of the **Directory Id** property 
 - Then use the full syntax to run the scripts:
-
-    ```PowerShell
-    . .\Cleanup.ps1 -Credential $mycreds -TenantId "yourTenantIdGuid"
-    . .\Configure.ps1 -Credential $mycreds -TenantId "yourTenantIdGuid"
-    ```
-
+```PowerShell
+. .\Cleanup.ps1 -Credential $mycreds -TenantId "yourTenantIdGuid"
+. .\Configure.ps1 -Credential $mycreds -TenantId "yourTenantIdGuid"
+```
  ### Option 4 (non-interactive, and create apps in a specified tenant)
 This option combines option 2 and option 3: it creates the application in a specific tenant. See option 3 for the way to get the tenant Id.
-
-    ```PowerShell
-    $secpasswd = ConvertTo-SecureString "[Password here]" -AsPlainText -Force
-    $mycreds = New-Object System.Management.Automation.PSCredential ("[login@tenantName here]", $secpasswd)
-    . .\Cleanup.ps1 -Credential $mycreds -TenantId "yourTenantIdGuid"
-    . .\Configure.ps1 -Credential $mycreds -TenantId "yourTenantIdGuid"
-    ```
+```PowerShell
+$secpasswd = ConvertTo-SecureString "[Password here]" -AsPlainText -Force
+$mycreds = New-Object System.Management.Automation.PSCredential ("[login@tenantName here]", $secpasswd)
+. .\Cleanup.ps1 -Credential $mycreds -TenantId "yourTenantIdGuid"
+. .\Configure.ps1 -Credential $mycreds -TenantId "yourTenantIdGuid"
+```
