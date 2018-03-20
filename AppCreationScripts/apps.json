@@ -11,7 +11,7 @@
       "PasswordCredentials": "Auto", // We'd want password credentals to be generated automatically
       "RequiredResourcesAccess": [
         {
-          "Resource": "Windows Azure Active Directory",
+          "Resource": "Microsoft Graph",
           "DelegatedPermissions": [ "User.Read" ]
         }
       ]

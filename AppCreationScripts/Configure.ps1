@@ -217,10 +217,10 @@ Function ConfigureApplications
    $serviceServicePrincipal = New-AzureADServicePrincipal -AppId $serviceAadApplication.AppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
    Write-Host "Done."
 
-   # Add Required Resources Access (from 'service' to 'Windows Azure Active Directory')
-   Write-Host "Getting access from 'service' to 'Windows Azure Active Directory'"
+   # Add Required Resources Access (from 'service' to 'Microsoft Graph')
+   Write-Host "Getting access from 'service' to 'Microsoft Graph'"
    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
-   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Windows Azure Active Directory" `
+   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft Graph" `
                                                  -requiredDelegatedPermissions "User.Read";
    $requiredResourcesAccess.Add($requiredPermissions)
    Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
@@ -259,6 +259,15 @@ Function ConfigureApplications
    $requiredResourcesAccess.Add($requiredPermissions)
    Set-AzureADApplication -ObjectId $spaAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
    Write-Host "Granted."
+
+    # Configure known client applications for service 
+	Write-Host "Configure known client applications for the 'service'"
+	$knowApplications = New-Object System.Collections.Generic.List[System.String]
+	$knowApplications.Add($clientAadApplication.AppId)
+	$knowApplications.Add($spaAadApplication.AppId)
+    Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -KnownClientApplications $knowApplications
+	Write-Host "Configured."
+
 
    # Update config file for 'service'
    $configFile = $pwd.Path + "\..\TodoListService\Web.Config"
