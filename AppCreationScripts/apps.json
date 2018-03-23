@@ -31,7 +31,7 @@
       "Id": "spa",
       "Name": "TodoListSPA-OBO",
       "IsPublicClient": false,
-      "HomePage": "https://localhost:44377/",
+      "HomePage": "http://localhost:16969/",
       "AllowImplicitFlow": true,
       "RequiredResourcesAccess": [
         {

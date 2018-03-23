@@ -257,9 +257,9 @@ Function ConfigureApplications
    # Create the spa AAD application
    Write-Host "Creating the AAD appplication (TodoListSPA-OBO)"
    $spaAadApplication = New-AzureADApplication -DisplayName "TodoListSPA-OBO" `
-                                               -HomePage "https://localhost:44377/" `
-                                               -ReplyUrls "https://TodoListSPA-OBO" `
-                                               -IdentifierUris "https://localhost:44377/" `
+                                               -HomePage "http://localhost:16969/" `
+                                               -ReplyUrls "http://localhost:16969/" `
+                                               -IdentifierUris "https://$tenantName/TodoListSPA-OBO" `
                                                -Oauth2AllowImplicitFlow $true `
                                                -PublicClient $False
    $currentAppId = $spaAadApplication.AppId
