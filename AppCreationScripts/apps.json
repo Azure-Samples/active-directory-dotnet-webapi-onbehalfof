@@ -7,7 +7,7 @@
       "Id": "service",
       "Name": "TodoListService-OBO",
       "IsPublicClient": false,
-      "HomePage": "http://localhost:9184/",
+      "HomePage": "https://localhost:44321/",
       "PasswordCredentials": "Auto", // We'd want password credentals to be generated automatically
       "RequiredResourcesAccess": [
         {
@@ -31,7 +31,7 @@
       "Id": "spa",
       "Name": "TodoListSPA-OBO",
       "IsPublicClient": false,
-      "HomePage": "http://localhost:16969/",
+      "HomePage": "https://localhost:44377/",
       "AllowImplicitFlow": true,
       "RequiredResourcesAccess": [
         {

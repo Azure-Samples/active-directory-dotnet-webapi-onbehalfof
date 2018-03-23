@@ -158,6 +158,9 @@ Function UpdateTextFile([string] $configFilePath, [System.Collections.HashTable]
 	Set-Content -Path $configFilePath -Value $lines -Force
 }
 
+Set-Content -Value "<html><body><table>" -Path createdApps.html
+Add-Content -Value "<thead><tr><th>Application</th><th>AppId</th><th>Url in the Azure portal</th></tr></thead><tbody>" -Path createdApps.html
+
 Function ConfigureApplications
 {
 <#.Description
@@ -210,12 +213,17 @@ Function ConfigureApplications
    $key = CreateAppKey -fromDate $fromDate -durationInYears 2 -pw $pw
    $serviceAppKey = $pw
    $serviceAadApplication = New-AzureADApplication -DisplayName "TodoListService-OBO" `
-                                                   -HomePage "http://localhost:9184/" `
+                                                   -HomePage "https://localhost:44321/" `
                                                    -IdentifierUris "https://$tenantName/TodoListService-OBO" `
                                                    -PasswordCredentials $key `
                                                    -PublicClient $False
-   $serviceServicePrincipal = New-AzureADServicePrincipal -AppId $serviceAadApplication.AppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
+   $currentAppId = $serviceAadApplication.AppId
+   $serviceServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
    Write-Host "Done."
+
+   # URL of the AAD application in the Azure portal
+   $servicePortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_IAM/ApplicationBlade/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.ObjectId
+   Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>TodoListService-OBO</a></td></tr>" -Path createdApps.html
 
    # Add Required Resources Access (from 'service' to 'Microsoft Graph')
    Write-Host "Getting access from 'service' to 'Microsoft Graph'"
@@ -230,8 +238,13 @@ Function ConfigureApplications
    $clientAadApplication = New-AzureADApplication -DisplayName "TodoListClient-OBO" `
                                                   -ReplyUrls "https://TodoListClient-OBO" `
                                                   -PublicClient $True
-   $clientServicePrincipal = New-AzureADServicePrincipal -AppId $clientAadApplication.AppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
+   $currentAppId = $clientAadApplication.AppId
+   $clientServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
    Write-Host "Done."
+
+   # URL of the AAD application in the Azure portal
+   $clientPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_IAM/ApplicationBlade/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.ObjectId
+   Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>TodoListClient-OBO</a></td></tr>" -Path createdApps.html
 
    # Add Required Resources Access (from 'client' to 'service')
    Write-Host "Getting access from 'client' to 'service'"
@@ -244,12 +257,18 @@ Function ConfigureApplications
    # Create the spa AAD application
    Write-Host "Creating the AAD appplication (TodoListSPA-OBO)"
    $spaAadApplication = New-AzureADApplication -DisplayName "TodoListSPA-OBO" `
-                                               -HomePage "http://localhost:16969/" `
-                                               -IdentifierUris "https://$tenantName/TodoListSPA-OBO" `
+                                               -HomePage "https://localhost:44377/" `
+                                               -ReplyUrls "https://TodoListSPA-OBO" `
+                                               -IdentifierUris "https://localhost:44377/" `
                                                -Oauth2AllowImplicitFlow $true `
                                                -PublicClient $False
-   $spaServicePrincipal = New-AzureADServicePrincipal -AppId $spaAadApplication.AppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
+   $currentAppId = $spaAadApplication.AppId
+   $spaServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
    Write-Host "Done."
+
+   # URL of the AAD application in the Azure portal
+   $spaPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_IAM/ApplicationBlade/appId/"+$spaAadApplication.AppId+"/objectId/"+$spaAadApplication.ObjectId
+   Add-Content -Value "<tr><td>spa</td><td>$currentAppId</td><td><a href='$spaPortalUrl'>TodoListSPA-OBO</a></td></tr>" -Path createdApps.html
 
    # Add Required Resources Access (from 'spa' to 'service')
    Write-Host "Getting access from 'spa' to 'service'"
@@ -291,8 +310,11 @@ Function ConfigureApplications
    Write-Host "Updating the sample code ($configFile)"
    $dictionary = @{ "tenant" = $tenantName;"clientId" = $spaAadApplication.AppId;"redirectUri" = $spaAadApplication.HomePage;"resourceId" = $serviceAadApplication.IdentifierUris;"resourceBaseAddress" = $serviceAadApplication.HomePage };
    UpdateTextFile -configFilePath $configFile -dictionary $dictionary
+  Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html
+
   }
 }
+
 
 # Run interactively (will ask you for the tenant ID)
 ConfigureApplications -Credential $Credential -tenantId $TenantId
