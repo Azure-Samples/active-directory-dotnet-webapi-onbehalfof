@@ -26,7 +26,7 @@ The TodoListService uses a database to:
 - store the todo list
 - illustrate [token cache serialization](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Token-cache-serialization) in a service
 
-   ![Topology](ReadmeFiles\Topology.png)
+   ![Topology](./ReadmeFiles/Topology.png)
 
 ### Scenario. How the sample uses ADAL.NET (and ADAL.js)
 
@@ -34,7 +34,7 @@ The TodoListService uses a database to:
 - `TodoListSPA`, the single page application, uses [ADAL.js](https://github.com/AzureAD/azure-activedirectory-library-for-js). When the user enters a todo item, `TodoListClient` and `TodoListSPA` call `TodoListService`  on the `/todolist` endpoint.
 - Then `TodoListService` also uses ADAL.NET  to get a token to act on behalf of the user to call the Microsoft Graph. For details, see [Service to service calls on behalf of the user](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Service-to-service-calls-on-behalf-of-the-user). It then decorates the todolist item entered by the user, with the First name and the Last name of the user. Below is a screen copy of what happens when the *automation service account* entered "item1" in the textbox.
 
-  ![Todo list client](ReadmeFiles\TodolistClient.png)
+  ![Todo list client](./ReadmeFiles/TodolistClient.png)
 
 Both flows use the OAuth 2.0 protocol to obtain the tokens. For more information about how the protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](http://go.microsoft.com/fwlink/?LinkId=394414).
 
