@@ -7,26 +7,31 @@ client: .NET Framework 4.5 Console, JavaScript SPA
 service: ASP.NET Web API
 endpoint: AAD V1
 ---
-
 # Calling a downstream web API from a web API using Azure AD
+
+![Build badge](https://identitydivision.visualstudio.com/_apis/public/build/definitions/a7934fdd-dcde-4492-a406-7fad6ac00e17/487/badge)
+
 ## About this sample
+
 ### Overview
+
 In this sample, the native client and simple JavaScript single page application:
+
 1. Acquire a token to act On Behalf Of the user
-2. Call a web API (TodoListService) 
+2. Call a web API (TodoListService)
 3. Which itself  calls another downstream web API (here the Microsoft Graph)
 
-The TodoListService leverages a database both to store the todo list, but more importantly to illustrate token cache serialization in a service
+The TodoListService leverages a database both to store the todo list, and to illustrate token cache serialization in a service
 
-![](ReadmeFiles\Topology.png)
- 
+   ![Topology](ReadmeFiles\Topology.png)
+
 ### Scenario. How the sample uses ADAL.NET (and ADAL.js)
-- `TodoListClient` uses  Active Directory Authentication Library for .NET (ADAL.NET) to acquire a token for the user in order to call the first web API. See [Acquiring tokens interactively Public client application flows](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Acquiring-tokens-interactively---Public-client-application-flows) for more details. 
-`TodoListSPA`, the single page application, uses [ADAL.js](https://github.com/AzureAD/azure-activedirectory-library-for-js). When the user enters a todo item, `TodoListClient` and `TodoListSPA` call `TodoListService`  on the `/todolist` endpoint.
 
+- `TodoListClient` uses  Active Directory Authentication Library for .NET (ADAL.NET) to acquire a token for the user in order to call the first web API. See [Acquiring tokens interactively Public client application flows](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Acquiring-tokens-interactively---Public-client-application-flows) for more details.
+- `TodoListSPA`, the single page application, uses [ADAL.js](https://github.com/AzureAD/azure-activedirectory-library-for-js). When the user enters a todo item, `TodoListClient` and `TodoListSPA` call `TodoListService`  on the `/todolist` endpoint.
 - Then `TodoListService` also uses ADAL.NET  to get a token to act on behalf of the user to call the Microsoft Graph.  For details see [Service to service calls on behalf of the user](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Service-to-service-calls-on-behalf-of-the-user). It then decorates the todolist item entered by the user, with the First name and the Last name of the user. Below is a screencopy of what happens when our automation service account entered "item1" in the textbox.
 
-     ![](ReadmeFiles\TodolistClient.png)
+  ![Todo list client](ReadmeFiles\TodolistClient.png)
 
 Both flows use the OAuth 2.0 protocol to obtain the tokens. For more information about how the protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](http://go.microsoft.com/fwlink/?LinkId=394414).
 
@@ -35,9 +40,10 @@ Both flows use the OAuth 2.0 protocol to obtain the tokens. For more information
 ## How to run this Sample
 
 To run this sample you will need:
+
 - [Visual Studio 2017](https://aka.ms/vsdownload)
 - An Internet connection
-- An Azure Active Directory (Azure AD) tenant. For more information on how to get an Azure AD tenant, please see [How to get an Azure AD tenant](https://azure.microsoft.com/en-us/documentation/articles/active-directory-howto-tenant/) 
+- An Azure Active Directory (Azure AD) tenant. For more information on how to get an Azure AD tenant, please see [How to get an Azure AD tenant](https://azure.microsoft.com/en-us/documentation/articles/active-directory-howto-tenant/)
 - A user account in your Azure AD tenant. This sample will not work with a Microsoft account, so if you signed in to the Azure portal with a Microsoft account and have never created a user account in your directory before, you need to do that now.
 
 ### Step 1:  Clone or download this repository
@@ -61,10 +67,10 @@ To register these projects you can  follow the steps in the paragraphs below. Al
 5. Enter a friendly name for the application, for example 'TodoListService' and select 'Web Application and/or Web API' as the Application Type. For the sign-on URL, enter the base URL for the sample, which is by default `https://localhost:44321`. Click on **Create** to create the application.
 6. While still in the Azure portal, choose your application, click on **Settings** and choose **Properties**.
 7. Find the Application ID value and copy it to the clipboard.
-8. For the App ID URI, enter https://\<your_tenant_name\>/TodoListService, replacing \<your_tenant_name\> with the name of your Azure AD tenant. 
-9. From the Settings menu, choose **Keys** and add a key 
-    - select a key duration of either 1 year or 2 years. When you save this page, the key value will be displayed, copy and save the value in a safe location 
-    - you will need this key later to configure the project in Visual Studio 
+8. For the App ID URI, enter https://\<your_tenant_name\>/TodoListService, replacing \<your_tenant_name\> with the name of your Azure AD tenant.
+9. From the Settings menu, choose **Keys** and add a key
+    - select a key duration of either 1 year or 2 years. When you save this page, the key value will be displayed, copy and save the value in a safe location
+    - you will need this key later to configure the project in Visual Studio
     - this key value will not be displayed again, nor retrievable by any other means, so please record it as soon as it is visible from the Azure Portal.
 
 NOTE:  In this sample, the `TodoListService` makes a delegated identity call to the Microsoft Graph API to read the user's profile.  By default, when the `TodoListService` is registered with Active Directory, it is configured to request this permission in the "Required Permissions" configuration section.  If you modify the TodoListService to call a different API, or if you build your own service that makes an On Behalf Of call, the service it calls and the permissions it requires must be added to the "Required Permissions" configuration in Azure AD.
@@ -79,7 +85,7 @@ NOTE:  In this sample, the `TodoListService` makes a delegated identity call to 
 6. While still in the Azure portal, choose your application, click on **Settings** and choose **Properties**.
 7. Find the Application ID value and copy it to the clipboard.
 8. Configure Permissions for your application - in the Settings menu, choose the 'Required permissions' section, click on **Add**, then **Select an API**, and type 'TodoListService' in the textbox. Then, click on  **Select Permissions** and select 'Access TodoListService'.
- 
+
 #### [Optionally] Register the TodoListSPA app
 
 1. Sign in to the [Azure portal](https://portal.azure.com).
@@ -89,11 +95,11 @@ NOTE:  In this sample, the `TodoListService` makes a delegated identity call to 
 5. Enter a friendly name for the application, for example 'TodoListSPA' and select 'Web Application and/or Web API' as the Application Type. For the redirect URI, enter `https://localhost:44377/`. Click on **Create** to create the application.
 6. While still in the Azure portal, choose your application, click on **Settings** and choose **Properties**.
 7. Find the Application ID value and copy it to the clipboard.
-9. Enable the OAuth 2 implicit grant for your application by choosing **Manifest** at the top of the application's page, and open the inline manifest editor. Search for the ``oauth2AllowImplicitFlow`` property. You will find that it is set to ``false``; change it to ``true`` and click on Save to save the manifest.
-10. Configure Permissions for your application - in the Settings menu, choose the 'Required permissions' section, click on **Add**, then **Select an API**, and type 'TodoListService' in the textbox. Then, click on  **Select Permissions** and select 'Access TodoListService'.
-
+8. Enable the OAuth 2 implicit grant for your application by choosing **Manifest** at the top of the application's page, and open the inline manifest editor. Search for the ``oauth2AllowImplicitFlow`` property. You will find that it is set to ``false``; change it to ``true`` and click on Save to save the manifest.
+9. Configure Permissions for your application - in the Settings menu, choose the 'Required permissions' section, click on **Add**, then **Select an API**, and type 'TodoListService' in the textbox. Then, click on  **Select Permissions** and select 'Access TodoListService'.
 
 #### Configure known client applications
+
 For the middle tier web API (`TodoListService`) to be able to call the downstream web API (here `Microsoft Graph`), the user must grant the middle tier permission to do so in the form of consent.  Because the middle tier has no interactive UI of its own, you need to explicitly bind the client app registration in Azure AD with the registration for the web API, which merges the consent required by both the client & middle tier into a single dialog. You can do so by adding the "Client ID" of the client app, to the manifest of the web API in the `knownClientApplications` property. Here's how:
 
 1. Navigate to your 'TodoListService' app registration, and open the manifest editor.
@@ -123,13 +129,15 @@ For the middle tier web API (`TodoListService`) to be able to call the downstrea
 6. Find the app key `todo:TodoListBaseAddress` and replace the value with the base address of the TodoListService project.
 
 #### [Optionnaly] Configure the TodoListSPA project
+
 If you have configured the TodoListSPA application in Azure AD, you want to update the JavaScript project:
+
 1. Open `appconfig.js`.
 2. In the `config`variable (which is about the Azure AD TodoListSPA configuration):
- - find the member named `tenant` and replace the value with your AAD tenant name.
- - find the member named `clientId` and replace the value with the Client ID for the TodoListSPA application from the Azure portal.
+  - find the member named `tenant` and replace the value with your AAD tenant name.
+  - find the member named `clientId` and replace the value with the Client ID for the TodoListSPA application from the Azure portal.
 3. In the  `WebApiConfig`variable (which is about configuration of the resource, that is the TodoListService):
- - find the member named `resourceId` and replace the value with the  App ID URI of the TodoListService, for example `https://<your_tenant_name>/TodoListService`.
+  - find the member named `resourceId` and replace the value with the  App ID URI of the TodoListService, for example `https://<your_tenant_name>/TodoListService`.
 
 ### Step 4:  Run the sample
 
@@ -148,7 +156,6 @@ The code for the Token cache serialization on the client side (in a file) is  in
 The code aquiring a token on behalf of the user from the service side is in [TodoListService/Controllers/TodoListController.cs](TodoListService/Controllers/TodoListController.cs)
 
 The code for the Service side serialization (in a database) is in [TodoListService/DAL/DbTokenCache.cs](TodoListService/DAL/DbTokenCache.cs) in the `CallGraphAPIOnBehalfOfUser()` method.
-
 
 ## How To Recreate This Sample
 
@@ -182,8 +189,10 @@ First, in Visual Studio 2017 create an empty solution to host the  projects.  Th
 Finally, in the properties of the solution itself, set both projects as startup projects.
 
 ## More information
+
 For more information see ADAL.NET's conceptual documentation:
+
 - [Recommanded pattern to acquire a token](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/AcquireTokenSilentAsync-using-a-cached-token#recommended-pattern-to-acquire-a-token)
-- [Acquiring tokens ineractively in public client applications](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Acquiring-tokens-interactively---Public-client-application-flows) 
+- [Acquiring tokens ineractively in public client applications](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Acquiring-tokens-interactively---Public-client-application-flows)
 - [Service to service calls on behalf of the user](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Service-to-service-calls-on-behalf-of-the-user).
 - [Customizing Token cache serialization](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Token-cache-serialization)
