@@ -40,14 +40,14 @@ Both flows use the OAuth 2.0 protocol to obtain the tokens. For more information
 
 > Looking for previous versions of this code sample? Check out the tags on the [releases](../../releases) GitHub page.
 
-## How to run this Sample
+## How to run this sample
 
-To run this sample, you will need:
+To run this sample, you'll need:
 
 - [Visual Studio 2017](https://aka.ms/vsdownload)
 - An Internet connection
 - An Azure Active Directory (Azure AD) tenant. For more information on how to get an Azure AD tenant, see [How to get an Azure AD tenant](https://azure.microsoft.com/en-us/documentation/articles/active-directory-howto-tenant/)
-- A user account in your Azure AD tenant. This sample will not work with a Microsoft account: if you signed in to the [Azure portal](https://portal.azure.com) with a Microsoft account and have never created a user account in your directory before, you need to do that now.
+- A user account in your Azure AD tenant. This sample will not work with a Microsoft account (formerly Windows Live account). Therefore, if you signed in to the [Azure portal](https://portal.azure.com) with a Microsoft account and have never created a user account in your directory before, you need to do that now.
 
 ### Step 1:  Clone or download this repository
 
@@ -57,21 +57,30 @@ From your shell or command line:
 
 ### Step 2:  Register the sample with your Azure Active Directory tenant
 
-There are three projects in this sample.  Each needs to be separately registered in your Azure AD tenant.
+There are three projects in this sample. Each needs to be separately registered in your Azure AD tenant. To register these projects, you can:
 
-To register these projects, you can  follow the steps in the paragraphs below. Alternatively, you can use a PowerShell script, which:
+- either follow the steps in the paragraphs below ([Step 2](#step-2--register-the-sample-with-your-azure-active-directory-tenant) and [Step 3](#step-3--configure-the-sample-to-use-your-azure-ad-tenant))
+- or use PowerShell scripts that:
+  - **automatically** create for you the Azure AD applications and related objects (passwords, permissions, dependencies)
+  - modify the Visual Studio projects' configuration files.
 
-1. Creates the Azure AD applications and related objects (passwords, permissions, dependencies)
-2. Modifies the project's configuration files for you.
+If you want to do use this automation, read the instructions in [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md)
 
-If you want to do use this automation, read these instructions [App Creation Scripts](./AppCreationScripts/AppCreationScripts.md), otherwise, keep reading.
+#### First step: choose the Azure AD tenant where you want to create your applications
 
-#### Register the TodoListService web API
+As a first step you'll need to:
 
 1. Sign in to the [Azure portal](https://portal.azure.com).
-2. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant where you wish to register your application.
-3. Click on **All Services** in the left hand nav, and choose **Azure Active Directory**.
-4. Click on **App registrations** and choose **New application registration**.
+1. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant where you wish to register your application.
+1. Click on **All services** in the left-hand nav, and choose **Azure Active Directory**.
+
+
+
+
+
+#### Register the service app (TodoListService-OBO)
+
+Click on **App registrations** and choose **New application registration**.
 5. Enter a friendly name for the application, for example 'TodoListService' and select 'Web app / API' as the Application Type. For the sign-on URL, enter the base URL for the sample, which is by default `https://localhost:44321`. Click on **Create** to create the application.
 6. In the succeeding page, find the **Application ID** value and copy it to the clipboard.
 7. Then click on **Settings** and choose **Properties**.
@@ -219,7 +228,9 @@ This project has adopted the [Microsoft Open Source Code of Conduct](https://ope
 
 For more information, see ADAL.NET's conceptual documentation:
 
-- [Recommanded pattern to acquire a token](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/AcquireTokenSilentAsync-using-a-cached-token#recommended-pattern-to-acquire-a-token)
+- [Recommended pattern to acquire a token](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/AcquireTokenSilentAsync-using-a-cached-token#recommended-pattern-to-acquire-a-token)
 - [Acquiring tokens ineractively in public client applications](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Acquiring-tokens-interactively---Public-client-application-flows)
 - [Service to service calls on behalf of the user](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Service-to-service-calls-on-behalf-of-the-user).
 - [Customizing Token cache serialization](https://github.com/AzureAD/azure-activedirectory-library-for-dotnet/wiki/Token-cache-serialization)
+
+For more information about how OAuth 2.0 protocols work in this scenario and other scenarios, see [Authentication Scenarios for Azure AD](http://go.microsoft.com/fwlink/?LinkId=394414).
