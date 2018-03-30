@@ -48,11 +48,11 @@ Function CreateAppKey([DateTime] $fromDate, [double] $durationInYears, [string]$
     $endDate = $fromDate.AddYears($durationInYears) 
     $keyId = (New-Guid).ToString();
     $key = New-Object Microsoft.Open.AzureAD.Model.PasswordCredential
-	$key.StartDate = $fromDate
-	$key.EndDate = $endDate
-	$key.Value = $pw
-	$key.KeyId = $keyId
-	return $key
+    $key.StartDate = $fromDate
+    $key.EndDate = $endDate
+    $key.Value = $pw
+    $key.KeyId = $keyId
+    return $key
 }
 
 # Adds the requiredAccesses (expressed as a pipe separated string) to the requiredAccess structure
@@ -81,15 +81,15 @@ Function AddResourcePermission($requiredAccess, `
 # See also: http://stackoverflow.com/questions/42164581/how-to-configure-a-new-azure-ad-application-through-powershell
 Function GetRequiredPermissions([string] $applicationDisplayName, [string] $requiredDelegatedPermissions, [string]$requiredApplicationPermissions, $servicePrincipal)
 {
-	# If we are passed the service principal we use it directly, otherwise we find it from the display name (which might not be unique)
-	if ($servicePrincipal)
-	{
-		$sp = $servicePrincipal
-	}
-	else
+    # If we are passed the service principal we use it directly, otherwise we find it from the display name (which might not be unique)
+    if ($servicePrincipal)
     {
-		$sp = Get-AzureADServicePrincipal -Filter "DisplayName eq '$applicationDisplayName'"
-	}
+        $sp = $servicePrincipal
+    }
+    else
+    {
+        $sp = Get-AzureADServicePrincipal -Filter "DisplayName eq '$applicationDisplayName'"
+    }
     $appid = $sp.AppId
     $requiredAccess = New-Object Microsoft.Open.AzureAD.Model.RequiredResourceAccess
     $requiredAccess.ResourceAppId = $appid 
@@ -130,32 +130,32 @@ Function ReplaceSetting([string] $configFilePath, [string] $key, [string] $newVa
 
 Function UpdateLine([string] $line, [string] $value)
 {
-	$index = $line.IndexOf(':')
-	if ($index -ige 0)
-	{
-		$line = $line.Substring(0, $index+1) + " """+$value + ""","
-	}
-	return $line
+    $index = $line.IndexOf(':')
+    if ($index -ige 0)
+    {
+        $line = $line.Substring(0, $index+1) + " """+$value + ""","
+    }
+    return $line
 }
 
 Function UpdateTextFile([string] $configFilePath, [System.Collections.HashTable] $dictionary)
 {
-	$lines = Get-Content $configFilePath
-	$index = 0
-	while($index -lt $lines.Length)
-	{
-		$line = $lines[$index]
-		foreach($key in $dictionary.Keys)
-		{
- 		 if ($line.Contains($key))
-		 {
-			$lines[$index] = UpdateLine $line $dictionary[$key]
-		 }
-		}
-		$index++
-	}
-	
-	Set-Content -Path $configFilePath -Value $lines -Force
+    $lines = Get-Content $configFilePath
+    $index = 0
+    while($index -lt $lines.Length)
+    {
+        $line = $lines[$index]
+        foreach($key in $dictionary.Keys)
+        {
+         if ($line.Contains($key))
+         {
+            $lines[$index] = UpdateLine $line $dictionary[$key]
+         }
+        }
+        $index++
+    }
+    
+    Set-Content -Path $configFilePath -Value $lines -Force
 }
 
 Set-Content -Value "<html><body><table>" -Path createdApps.html
@@ -280,12 +280,12 @@ Function ConfigureApplications
    Write-Host "Granted."
 
     # Configure known client applications for service 
-	Write-Host "Configure known client applications for the 'service'"
-	$knowApplications = New-Object System.Collections.Generic.List[System.String]
-	$knowApplications.Add($clientAadApplication.AppId)
-	$knowApplications.Add($spaAadApplication.AppId)
+    Write-Host "Configure known client applications for the 'service'"
+    $knowApplications = New-Object System.Collections.Generic.List[System.String]
+    $knowApplications.Add($clientAadApplication.AppId)
+    $knowApplications.Add($spaAadApplication.AppId)
     Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -KnownClientApplications $knowApplications
-	Write-Host "Configured."
+    Write-Host "Configured."
 
 
    # Update config file for 'service'
@@ -294,7 +294,7 @@ Function ConfigureApplications
    ReplaceSetting -configFilePath $configFile -key "ida:Tenant" -newValue $tenantName
    ReplaceSetting -configFilePath $configFile -key "ida:Audience" -newValue $serviceAadApplication.IdentifierUris
    ReplaceSetting -configFilePath $configFile -key "ida:AppKey" -newValue $serviceAppKey
-   ReplaceSetting -configFilePath $configFile -key "ida:ClientID" -newValue $serviceAadApplication.AppId
+   ReplaceSetting -configFilePath $configFile -key "ida:ClientId" -newValue $serviceAadApplication.AppId
 
    # Update config file for 'client'
    $configFile = $pwd.Path + "\..\TodoListClient\App.Config"
