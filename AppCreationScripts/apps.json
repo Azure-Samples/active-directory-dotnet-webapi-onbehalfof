@@ -2,16 +2,22 @@
   /*
   This section describes the Azure AD  Applications to configure, and their dependencies
   */
+  "Sample": {
+    "Title": "Calling a downstream web API from a web API using Azure AD",
+    "Level": 400,
+    "Client": ".NET Framework 4.5 Console, JavaScript SPA",
+    "Service": "ASP.NET Web API"
+  },
   "AADApps": [
     {
       "Id": "service",
       "Name": "TodoListService-OBO",
       "IsPublicClient": false,
-      "HomePage": "http://localhost:9184/",
+      "HomePage": "https://localhost:44321/",
       "PasswordCredentials": "Auto", // We'd want password credentals to be generated automatically
       "RequiredResourcesAccess": [
         {
-          "Resource": "Windows Azure Active Directory",
+          "Resource": "Microsoft Graph",
           "DelegatedPermissions": [ "User.Read" ]
         }
       ]

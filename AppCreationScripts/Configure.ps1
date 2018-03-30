@@ -7,26 +7,7 @@
  1) Run Powershell as an administrator
  2) in the PowerShell window, type: Install-Module AzureAD
 
- There are three ways to run this script
- Option1 (interactive)
- ---------------------
- Just run . .\Configue.ps1, and you will be prompted to sign-in (email address, password, and if needed MFA). 
- The script will be run as the signed-in user and will use the tenant in which the user is defined.
-
- Option 2 (Interactive, but create apps in a specified tenant)
- -------------------------------------------------------------
- If you want to create the apps in a specific tenant, before you run this script
- - In the Azure portal (https://portal.azure.com), choose your active directory tenant, then go to the Properties of the tenant and copy
-   the DirectoryID. This is what we'll use in this script for the tenant ID
- - run . .\Configue.ps1 -TenantId [place here the GUID representing the tenant ID]
-
- Option 2 (non-interactive)
- ---------------------------
- This supposes that you know the credentials of the user under which identity you want to create
- the applications. Here is an example of script you'd want to run in a PowerShell Window
-   $secpasswd = ConvertTo-SecureString "[Password here]" -AsPlainText -Force
-   $mycreds = New-Object System.Management.Automation.PSCredential ("[login@tenantName here]", $secpasswd)
-   . .\Configure.ps1 -Credential $mycreds
+ There are four ways to run this script. For more information, read the AppCreationScripts.md file in the same folder as this script.
 #>
 
 # Create a password that can be used as an application key
@@ -48,11 +29,11 @@ Function CreateAppKey([DateTime] $fromDate, [double] $durationInYears, [string]$
     $endDate = $fromDate.AddYears($durationInYears) 
     $keyId = (New-Guid).ToString();
     $key = New-Object Microsoft.Open.AzureAD.Model.PasswordCredential
-	$key.StartDate = $fromDate
-	$key.EndDate = $endDate
-	$key.Value = $pw
-	$key.KeyId = $keyId
-	return $key
+    $key.StartDate = $fromDate
+    $key.EndDate = $endDate
+    $key.Value = $pw
+    $key.KeyId = $keyId
+    return $key
 }
 
 # Adds the requiredAccesses (expressed as a pipe separated string) to the requiredAccess structure
@@ -81,15 +62,15 @@ Function AddResourcePermission($requiredAccess, `
 # See also: http://stackoverflow.com/questions/42164581/how-to-configure-a-new-azure-ad-application-through-powershell
 Function GetRequiredPermissions([string] $applicationDisplayName, [string] $requiredDelegatedPermissions, [string]$requiredApplicationPermissions, $servicePrincipal)
 {
-	# If we are passed the service principal we use it directly, otherwise we find it from the display name (which might not be unique)
-	if ($servicePrincipal)
-	{
-		$sp = $servicePrincipal
-	}
-	else
+    # If we are passed the service principal we use it directly, otherwise we find it from the display name (which might not be unique)
+    if ($servicePrincipal)
     {
-		$sp = Get-AzureADServicePrincipal -Filter "DisplayName eq '$applicationDisplayName'"
-	}
+        $sp = $servicePrincipal
+    }
+    else
+    {
+        $sp = Get-AzureADServicePrincipal -Filter "DisplayName eq '$applicationDisplayName'"
+    }
     $appid = $sp.AppId
     $requiredAccess = New-Object Microsoft.Open.AzureAD.Model.RequiredResourceAccess
     $requiredAccess.ResourceAppId = $appid 
@@ -130,33 +111,40 @@ Function ReplaceSetting([string] $configFilePath, [string] $key, [string] $newVa
 
 Function UpdateLine([string] $line, [string] $value)
 {
-	$index = $line.IndexOf(':')
-	if ($index -ige 0)
-	{
-		$line = $line.Substring(0, $index+1) + " """+$value + ""","
-	}
-	return $line
+    $index = $line.IndexOf(':')
+    if ($index -eq -1)
+    {
+        $index = $line.IndexOf('=')
+    }
+    if ($index -ige 0)
+    {
+        $line = $line.Substring(0, $index+1) + " """+$value + ""","
+    }
+    return $line
 }
 
 Function UpdateTextFile([string] $configFilePath, [System.Collections.HashTable] $dictionary)
 {
-	$lines = Get-Content $configFilePath
-	$index = 0
-	while($index -lt $lines.Length)
-	{
-		$line = $lines[$index]
-		foreach($key in $dictionary.Keys)
-		{
- 		 if ($line.Contains($key))
-		 {
-			$lines[$index] = UpdateLine $line $dictionary[$key]
-		 }
-		}
-		$index++
-	}
-	
-	Set-Content -Path $configFilePath -Value $lines -Force
+    $lines = Get-Content $configFilePath
+    $index = 0
+    while($index -lt $lines.Length)
+    {
+        $line = $lines[$index]
+        foreach($key in $dictionary.Keys)
+        {
+            if ($line.Contains($key))
+            {
+                $lines[$index] = UpdateLine $line $dictionary[$key]
+            }
+        }
+        $index++
+    }
+
+    Set-Content -Path $configFilePath -Value $lines -Force
 }
+
+Set-Content -Value "<html><body><table>" -Path createdApps.html
+Add-Content -Value "<thead><tr><th>Application</th><th>AppId</th><th>Url in the Azure portal</th></tr></thead><tbody>" -Path createdApps.html
 
 Function ConfigureApplications
 {
@@ -210,17 +198,22 @@ Function ConfigureApplications
    $key = CreateAppKey -fromDate $fromDate -durationInYears 2 -pw $pw
    $serviceAppKey = $pw
    $serviceAadApplication = New-AzureADApplication -DisplayName "TodoListService-OBO" `
-                                                   -HomePage "http://localhost:9184/" `
+                                                   -HomePage "https://localhost:44321/" `
                                                    -IdentifierUris "https://$tenantName/TodoListService-OBO" `
                                                    -PasswordCredentials $key `
                                                    -PublicClient $False
-   $serviceServicePrincipal = New-AzureADServicePrincipal -AppId $serviceAadApplication.AppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
+   $currentAppId = $serviceAadApplication.AppId
+   $serviceServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
    Write-Host "Done."
 
-   # Add Required Resources Access (from 'service' to 'Windows Azure Active Directory')
-   Write-Host "Getting access from 'service' to 'Windows Azure Active Directory'"
+   # URL of the AAD application in the Azure portal
+   $servicePortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_IAM/ApplicationBlade/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.ObjectId
+   Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>TodoListService-OBO</a></td></tr>" -Path createdApps.html
+
+   # Add Required Resources Access (from 'service' to 'Microsoft Graph')
+   Write-Host "Getting access from 'service' to 'Microsoft Graph'"
    $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
-   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Windows Azure Active Directory" `
+   $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft Graph" `
                                                  -requiredDelegatedPermissions "User.Read";
    $requiredResourcesAccess.Add($requiredPermissions)
    Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
@@ -230,8 +223,13 @@ Function ConfigureApplications
    $clientAadApplication = New-AzureADApplication -DisplayName "TodoListClient-OBO" `
                                                   -ReplyUrls "https://TodoListClient-OBO" `
                                                   -PublicClient $True
-   $clientServicePrincipal = New-AzureADServicePrincipal -AppId $clientAadApplication.AppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
+   $currentAppId = $clientAadApplication.AppId
+   $clientServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
    Write-Host "Done."
+
+   # URL of the AAD application in the Azure portal
+   $clientPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_IAM/ApplicationBlade/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.ObjectId
+   Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>TodoListClient-OBO</a></td></tr>" -Path createdApps.html
 
    # Add Required Resources Access (from 'client' to 'service')
    Write-Host "Getting access from 'client' to 'service'"
@@ -245,11 +243,17 @@ Function ConfigureApplications
    Write-Host "Creating the AAD appplication (TodoListSPA-OBO)"
    $spaAadApplication = New-AzureADApplication -DisplayName "TodoListSPA-OBO" `
                                                -HomePage "http://localhost:16969/" `
+                                               -ReplyUrls "http://localhost:16969/" `
                                                -IdentifierUris "https://$tenantName/TodoListSPA-OBO" `
                                                -Oauth2AllowImplicitFlow $true `
                                                -PublicClient $False
-   $spaServicePrincipal = New-AzureADServicePrincipal -AppId $spaAadApplication.AppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
+   $currentAppId = $spaAadApplication.AppId
+   $spaServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
    Write-Host "Done."
+
+   # URL of the AAD application in the Azure portal
+   $spaPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_IAM/ApplicationBlade/appId/"+$spaAadApplication.AppId+"/objectId/"+$spaAadApplication.ObjectId
+   Add-Content -Value "<tr><td>spa</td><td>$currentAppId</td><td><a href='$spaPortalUrl'>TodoListSPA-OBO</a></td></tr>" -Path createdApps.html
 
    # Add Required Resources Access (from 'spa' to 'service')
    Write-Host "Getting access from 'spa' to 'service'"
@@ -259,6 +263,15 @@ Function ConfigureApplications
    $requiredResourcesAccess.Add($requiredPermissions)
    Set-AzureADApplication -ObjectId $spaAadApplication.ObjectId -RequiredResourceAccess $requiredResourcesAccess
    Write-Host "Granted."
+
+   # Configure known client applications for service 
+   Write-Host "Configure known client applications for the 'service'"
+   $knowApplications = New-Object System.Collections.Generic.List[System.String]
+	$knowApplications.Add($clientAadApplication.AppId)
+	$knowApplications.Add($spaAadApplication.AppId)
+   Set-AzureADApplication -ObjectId $serviceAadApplication.ObjectId -KnownClientApplications $knowApplications
+   Write-Host "Configured."
+
 
    # Update config file for 'service'
    $configFile = $pwd.Path + "\..\TodoListService\Web.Config"
@@ -282,8 +295,11 @@ Function ConfigureApplications
    Write-Host "Updating the sample code ($configFile)"
    $dictionary = @{ "tenant" = $tenantName;"clientId" = $spaAadApplication.AppId;"redirectUri" = $spaAadApplication.HomePage;"resourceId" = $serviceAadApplication.IdentifierUris;"resourceBaseAddress" = $serviceAadApplication.HomePage };
    UpdateTextFile -configFilePath $configFile -dictionary $dictionary
+   Add-Content -Value "</tbody></table></body></html>" -Path createdApps.html
+
   }
 }
+
 
 # Run interactively (will ask you for the tenant ID)
 ConfigureApplications -Credential $Credential -tenantId $TenantId

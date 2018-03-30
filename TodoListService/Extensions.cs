@@ -1,4 +1,5 @@
-﻿/*
+﻿using System;
+/*
  The MIT License (MIT)
 
 Copyright (c) 2015 Microsoft Corporation
@@ -22,17 +23,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace TodoListService.Models
+namespace TodoListService
 {
-    public class UserProfile
+    public static class Extensions
     {
-        public string DisplayName { get; set; }
-        public string GivenName { get; set; }
-        public string Surname { get; set; }
+        public static bool ContainsAny(this string stringToEvaluate, params string[] items)
+        {
+            foreach (string item in items)
+            {
+                if (stringToEvaluate.Contains(item))
+                    return true;
+            }
+
+            return false;
+        }
     }
 }
