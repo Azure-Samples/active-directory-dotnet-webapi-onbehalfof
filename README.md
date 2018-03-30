@@ -74,23 +74,21 @@ As a first step you'll need to:
 1. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant where you wish to register your application.
 1. Click on **All services** in the left-hand nav, and choose **Azure Active Directory**.
 
-
-
-
-
 #### Register the service app (TodoListService-OBO)
 
 Click on **App registrations** and choose **New application registration**.
-5. Enter a friendly name for the application, for example 'TodoListService' and select 'Web app / API' as the Application Type. For the sign-on URL, enter the base URL for the sample, which is by default `https://localhost:44321`. Click on **Create** to create the application.
-6. In the succeeding page, find the **Application ID** value and copy it to the clipboard.
-7. Then click on **Settings** and choose **Properties**.
-8. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/<guid>', with the name of your service, e.g. 'https://\<your_tenant_name\>/TodoListService'.
-9. From the Settings menu, choose **Keys** and add a key
+
+1. Enter a friendly name for the application, for example 'TodoListService' and select 'Web app / API' as the Application Type. For the sign-on URL, enter the base URL for the sample, which is by default `https://localhost:44321`. Click on **Create** to create the application.
+1. In the succeeding page, find the **Application ID** value and copy it to the clipboard.
+1. Then click on **Settings** and choose **Properties**.
+1. For the App ID URI, replace the guid in the generated URI 'https://\<your_tenant_name\>/\<guid\>', with the name of your service, for example, 'https://\<your_tenant_name\>/TodoListService'.
+1. From the Settings menu, choose **Keys** and add a key:
+
     - Select a key duration of either **1 year**, **2 years** or **Never Expires**. When you save this page, the key value will be displayed, copy, and save the value in a safe location.
     - You will need this key later to configure the project in Visual Studio.
-    - This key value will not be displayed again, nor retrievable by any other means, so record it as soon as it is visible in the Azure Portal.
+    - This key value will not be displayed again, nor retrievable by any other means, so record it as soon as it is visible in the Azure portal.
 
-NOTE:  In this sample, the `TodoListService` makes a delegated identity call to the Microsoft Graph API to read the user's profile.  By default, when the `TodoListService` is registered with Active Directory, it is configured to request permission to the AAD Graph API. you can see this in the "Required Permissions" configuration section.  If you modify the `TodoListService` to call a different API, or if you build your own service that makes an On-Behalf-Of call, the service it calls and the permissions it requires must be added to the "Required Permissions" configuration in Azure AD.
+NOTE:  In this sample, the `TodoListService` makes a delegated identity call to the Microsoft Graph API to read the user's profile.  By default, when the `TodoListService` is registered with Active Directory, it is configured to request permission to the AAD Graph API. you can see this configuration in the "Required Permissions" configuration section.  If you modify the `TodoListService` to call a different API, or if you build your own service that makes an On-Behalf-Of call, the service it calls and the permissions it requires must be added to the "Required Permissions" configuration in Azure AD.
 
 #### Register the TodoListClient app
 
@@ -98,8 +96,8 @@ NOTE:  In this sample, the `TodoListService` makes a delegated identity call to 
 2. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant where you wish to register your application.
 3. Click on **More Services** in the left-hand nav, and choose **Azure Active Directory**.
 4. Click on **App registrations** and choose **New application registration**.
-5. Enter a friendly name for the application, for example 'TodoListClient-DotNet' and select 'Native' as the Application Type. For the redirect URI, enter `https://TodoListClient`. Note that the Redirect URI will not be used in this sample, but it needs to be defined nonetheless. Click on **Create** to create the application.
-6. In the succeeding page, find the **Application ID** value and copy it to the clipboard. 
+5. Enter a friendly name for the application, for example 'TodoListClient-DotNet' and select 'Native' as the Application Type. For the redirect URI, enter `https://TodoListClient`. The Redirect URI will not be used in this sample, but it needs to be defined nonetheless. Click on **Create** to create the application.
+6. In the succeeding page, find the **Application ID** value and copy it to the clipboard.
 7. While still in the Azure portal, choose your application, click on **Settings**, and choose **Properties**.
 8. Configure Permissions for your application - in the Settings menu, choose the 'Required permissions' section, click on **Add**, then **Select an API**, and type 'TodoListService' in the textbox. Then, click on  **Select Permissions** and select 'Access TodoListService'.
 
@@ -110,8 +108,8 @@ NOTE:  In this sample, the `TodoListService` makes a delegated identity call to 
 3. Click on **More Services** in the left-hand nav, and choose **Azure Active Directory**.
 4. Click on **App registrations** and choose **New application registration**.
 5. Enter a friendly name for the application, for example 'TodoListSPA' and select 'Web app / API' as the Application Type. For the redirect URI, enter `https://localhost:44377/`. Click on **Create** to create the application.
-6. In the succeeding page, find the **Application ID** value and copy it to the clipboard. 
-7. Enable the OAuth 2 implicit grant for your application by choosing **Manifest** at the top of the application's page. Open the inline manifest editor. Search for the ``oauth2AllowImplicitFlow`` property. You will find that it is set to ``false``; change it to ``true`` and click on Save to save the manifest. 
+6. In the succeeding page, find the **Application ID** value and copy it to the clipboard.
+7. Enable the OAuth 2 implicit grant for your application by choosing **Manifest** at the top of the application's page. Open the inline manifest editor. Search for the ``oauth2AllowImplicitFlow`` property. You will find that it is set to ``false``; change it to ``true`` and click on Save to save the manifest.
 8. While still in the Azure portal, choose your application, click on **Settings**, and choose **Properties**
 9. Configure Permissions for your application - in the Settings menu, choose the 'Required permissions' section, click on **Add**, then **Select an API**, and type 'TodoListService' in the textbox. Then, click on  **Select Permissions** and select 'Access TodoListService'.
 
@@ -151,11 +149,15 @@ If you have configured the TodoListSPA application in Azure AD, you want to upda
 
 1. Open `appconfig.js`.
 2. In the `config`variable (which is about the Azure AD TodoListSPA configuration):
-  - find the member named `tenant` and replace the value with your AAD tenant name.
-  - find the member named `clientId` and replace the value with the Client ID for the TodoListSPA application from the Azure portal.
-  - find the member named `redirectUri` and replace the value with the redirect URI you provided for the TodoListSPA application from the Azure portal, e.g. `https://localhost:44377/`.
+
+- find the member named `tenant` and replace the value with your AAD tenant name.
+- find the member named `clientId` and replace the value with the Client ID for the TodoListSPA application from the Azure portal.
+- find the member named `redirectUri` and replace the value with the redirect URI you provided for the TodoListSPA application from the Azure portal, for example, `https://localhost:44377/`.
+
 3. In the `WebApiConfig`variable (which is about configuration of the resource, that is the TodoListService):
-  - find the member named `resourceId` and replace the value with the  App ID URI of the TodoListService, for example `https://<your_tenant_name>/TodoListService`.
+
+   - find the member named `resourceId` and replace the value with the  App ID URI of the TodoListService, for example `https://<your_tenant_name>/TodoListService`.
+
 4. While running the SPA app in the browser, take care to allow popups from this app.
 
 ### Step 4:  Run the sample
@@ -183,18 +185,17 @@ First, in Visual Studio 2017 create an empty solution to host the  projects. The
 ### Creating the TodoListService Project
 
 1. In Visual Studio 2017, create a new `Visual C#` `ASP.NET Web Application (.NET Framework)` project. In the next screen, choose the `Web API` project template.  And while on this screen, click the Change Authentication button, select 'Work or School Accounts', 'Cloud - Single Organization', enter the name of your Azure AD tenant.  You will be prompted to sign in to your Azure AD tenant.  NOTE:  You must sign in with a user that is in the tenant; you cannot, during this step, sign in with a Microsoft account.
-2. Add the Active Directory Authentication Library (ADAL) NuGet, Microsoft.IdentityModel.Clients.ActiveDirectory, EntityFramework and Microsoft.AspNet.WebApi.Cors to the project.
+2. Add the Active Directory Authentication Library (ADAL) NuGet, Microsoft.IdentityModel.Clients.ActiveDirectory, EntityFramework, and Microsoft.AspNet.WebApi.Cors to the project.
 3. Add reference of the `System.IdentityModel` assembly in the project.
-3. In the `Models` folder, add a new class called `TodoItem.cs`.  Copy the implementation of TodoItem from this sample into the class.
-4. In the `Models` folder, add a new class called `UserProfile.cs`.  Copy the implementation of UserProfile from this sample into the class.
-5. Create a new folder named `DAL`.In the `DAL` folder, add a new class called `DbTokenCache.cs`.  Copy the implementation of DbTokenCache from this sample into the class.
-6. In the `DAL` folder, add a new class called `TodoListServiceContext.cs`.  Copy the implementation of TodoListServiceContext from this sample into the class.
-7. Add a new class named `Extensions` in the project. Replace the implementation with the contents of the file of the same name from the sample.
-7. Add a new, empty, Web API 2 Controller called `TodoListController`.
-8. Copy the implementation of the TodoListController from this sample into the controller.  Don't forget to add the `[Authorize]` attribute to the class.
-
-10. In `web.config` make sure that the key `ida:AADInstance`, `ida:Tenant`, `ida:ClientID`, and `ida:Password` exist, and are populated.  For the global Azure cloud, the value of `ida:AADInstance` is `https://login.onmicrosoft.com/{0}`.
-11. In `web.config`, in `<appSettings>`, create keys for `ida:GraphResourceId` and `ida:GraphUserUrl` and set the values accordingly.  For the global Azure AD, the value of `ida:GraphResourceId` is `https://graph.microsoft.com`, and the value of `ida:GraphUserUrl` is `https://graph.microsoft.com/v1.0/me/`.
+4. In the `Models` folder, add a new class called `TodoItem.cs`.  Copy the implementation of TodoItem from this sample into the class.
+5. In the `Models` folder, add a new class called `UserProfile.cs`.  Copy the implementation of UserProfile from this sample into the class.
+6. Create a new folder named `DAL`.In the `DAL` folder, add a new class called `DbTokenCache.cs`.  Copy the implementation of DbTokenCache from this sample into the class.
+7. In the `DAL` folder, add a new class called `TodoListServiceContext.cs`.  Copy the implementation of TodoListServiceContext from this sample into the class.
+8. Add a new class named `Extensions` in the project. Replace the implementation with the contents of the file of the same name from the sample.
+9. Add a new, empty, Web API 2 Controller called `TodoListController`.
+10. Copy the implementation of the TodoListController from this sample into the controller.  Don't forget to add the `[Authorize]` attribute to the class.
+11. In `web.config` make sure that the key `ida:AADInstance`, `ida:Tenant`, `ida:ClientID`, and `ida:AppKey` exist, and are populated.  For the global Azure cloud, the value of `ida:AADInstance` is `https://login.onmicrosoft.com/{0}`.
+12. In `web.config`, in `<appSettings>`, create keys for `ida:GraphResourceId` and `ida:GraphUserUrl` and set the values accordingly.  For the global Azure AD, the value of `ida:GraphResourceId` is `https://graph.microsoft.com`, and the value of `ida:GraphUserUrl` is `https://graph.microsoft.com/v1.0/me/`.
 
 ### Creating the TodoListClient Project
 
@@ -211,7 +212,7 @@ Finally, in the properties of the solution itself, set both projects as startup 
 
 ## Community Help and Support
 
-We use [Stack Overflow](http://stackoverflow.com/questions/tagged/msal) with the community to provide support. We highly recommend you ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before. Make sure that your questions or comments are tagged with [msal.dotnet].
+Use [Stack Overflow](http://stackoverflow.com/questions/tagged/adal) to get community support. Ask your questions on Stack Overflow first and browse existing issues to see if someone has asked your question before. Make sure that your questions or comments are tagged with [`adal` `dotnet`].
 
 If you find and bug in the sample, please raise the issue on [GitHub Issues](../../issues).
 
@@ -222,7 +223,6 @@ To provide a recommendation, visit the following [User Voice page](https://feedb
 If you'd like to contribute to this sample, see [CONTRIBUTING.MD](/CONTRIBUTING.md).
 
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information, see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
-
 
 ## More information
 
