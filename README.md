@@ -74,7 +74,7 @@ As a first step you'll need to:
 1. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant where you wish to register your application.
 1. Click on **All services** in the left-hand nav, and choose **Azure Active Directory**.
 
-#### Register the service app (TodoListService-OBO)
+#### Register the service app (TodoListService)
 
 Click on **App registrations** and choose **New application registration**.
 
@@ -177,6 +177,62 @@ The code for the Token cache serialization on the client side (in a file) is in 
 The code acquiring a token on behalf of the user from the service side is in [TodoListService/Controllers/TodoListController.cs](TodoListService/Controllers/TodoListController.cs)
 
 The code for the Service side serialization (in a database) is in [TodoListService/DAL/DbTokenCache.cs](TodoListService/DAL/DbTokenCache.cs) in the `CallGraphAPIOnBehalfOfUser()` method.
+
+## How to deploy this sample to Azure
+
+This project has two WebApp / Web API projects. To deploy them to Azure Web Sites, you'll need, for each one, to:
+
+- create an Azure Web Site
+- publish the Web App / Web APIs to the web site, and
+- update its client(s) to call the web site instead of IIS Express.
+
+### Create and Publish the `TodoListService` to an Azure Web Site
+
+1. Sign in to the [Azure portal](https://portal.azure.com).
+2. Click New in the top left-hand corner, select Web + Mobile --> Web App, select the hosting plan and region, and give your web site a name, for example, `TodoListService-contoso.azurewebsites.net`.  Click Create Web Site.
+3. Once the web site is created, click on it to manage it.  For this set of steps, download the publish profile and save it.  Other deployment mechanisms, such as from source control, can also be used.
+4. Switch to Visual Studio and go to the TodoListService project.  Right click on the project in the Solution Explorer and select Publish.  Click Import, and import the publish profile that you downloaded.
+5. On the Connection tab, update the Destination URL so that it is https, for example [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net). Click Next.
+6. On the Settings tab, make sure Enable Organizational Authentication is NOT selected.  Click Publish.
+7. Visual Studio will publish the project and automatically open a browser to the URL of the project.  If you see the default web page of the project, the publication was successful.
+
+### Update the Active Directory tenant application registration for `TodoListService`
+
+1. Navigate to the [Azure portal](https://portal.azure.com).
+2. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant containing the `TodoListService` application.
+3. On the applications tab, select the `TodoListService` application.
+4. From the Settings -> Properties and Settings -> Reply URLs menus, update the Sign-On URL, and Reply URL fields to the address of your service, for example [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net). Save the configuration.
+
+### Update the `TodoListClient` to call the `TodoListService` Running in Azure Web Sites
+
+1. In Visual Studio, go to the `TodoListClient-OBO` project.
+2. Open `TodoListClient\App.Config`.  Only one change is needed - update the `todo:TodoListBaseAddress` key value to be the address of the website you published,
+   for example, [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net).
+3. Run the client! If you are trying multiple different client types (for example, .Net, Windows Store, Android, iOS) you can have them all call this one published web API.
+
+### Update the `TodoListSPA` to call the `TodoListService` Running in Azure Web Sites
+
+1. In Visual Studio, go to the `TodoListSPA` project.
+2. Open `TodoListSPA\appconfig.js`.  Only one change is needed - update the `todo:TodoListBaseAddress` key value to be the address of the website you published,
+   for example, [https://TodoListService-contoso.azurewebsites.net](https://TodoListService-contoso.azurewebsites.net).
+3. Run the client! If you are trying multiple different client types (for example, .Net, Windows Store, Android, iOS) you can have them all call this one published web API.
+
+### Create and Publish the `TodoListSPA` to an Azure Web Site
+
+1. Sign in to the [Azure portal](https://portal.azure.com).
+2. Click New in the top left-hand corner, select Web + Mobile --> Web App, select the hosting plan and region, and give your web site a name, for example, `TodoListSPA-contoso.azurewebsites.net`.  Click Create Web Site.
+3. Once the web site is created, click on it to manage it.  For this set of steps, download the publish profile and save it.  Other deployment mechanisms, such as from source control, can also be used.
+4. Switch to Visual Studio and go to the TodoListService project.  Right click on the project in the Solution Explorer and select Publish.  Click Import, and import the publish profile that you downloaded.
+5. On the Connection tab, update the Destination URL so that it is https, for example [https://TodoListSPA-contoso.azurewebsites.net](https://TodoListSPA-contoso.azurewebsites.net). Click Next.
+6. On the Settings tab, make sure Enable Organizational Authentication is NOT selected.  Click Publish.
+7. Visual Studio will publish the project and automatically open a browser to the URL of the project.  If you see the default web page of the project, the publication was successful.
+
+### Update the Active Directory tenant application registration for `TodoListSPA`
+
+1. Navigate to the [Azure portal](https://portal.azure.com).
+2. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant containing the `TodoListSPA` application.
+3. On the applications tab, select the `TodoListSPA` application.
+4. From the Settings -> Properties and Settings -> Reply URLs menus, update the Sign-On URL, and Reply URL fields to the address of your service, for example [https://TodoListSPA-contoso.azurewebsites.net](https://TodoListSPA-contoso.azurewebsites.net). Save the configuration.
 
 ## How To Recreate This Sample
 
