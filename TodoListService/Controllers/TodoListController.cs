@@ -60,8 +60,8 @@ namespace TodoListService.Controllers
         //
         private static string aadInstance = ConfigurationManager.AppSettings["ida:AADInstance"];
         private static string tenant = ConfigurationManager.AppSettings["ida:Tenant"];
-        private static string clientId = ConfigurationManager.AppSettings["ida:ClientId"];
-        private static string appKey = ConfigurationManager.AppSettings["ida:AppKey"];
+        private static string clientId = ConfigurationManager.AppSettings["ida:ClientID"];
+        private static string appKey = ConfigurationManager.AppSettings["ida:Password"];
 
         //
         // To authenticate to the Graph API, the app needs to know the Grah API's App ID URI.
