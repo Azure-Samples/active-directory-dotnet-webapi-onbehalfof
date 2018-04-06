@@ -112,13 +112,15 @@ Function ReplaceSetting([string] $configFilePath, [string] $key, [string] $newVa
 Function UpdateLine([string] $line, [string] $value)
 {
     $index = $line.IndexOf(':')
+    $delimiter = ','
     if ($index -eq -1)
     {
         $index = $line.IndexOf('=')
+        $delimiter = ';'
     }
     if ($index -ige 0)
     {
-        $line = $line.Substring(0, $index+1) + " """+$value + ""","
+        $line = $line.Substring(0, $index+1) + " "+'"'+$value+'"'+$delimiter
     }
     return $line
 }
@@ -202,6 +204,8 @@ Function ConfigureApplications
                                                    -IdentifierUris "https://$tenantName/TodoListService-OBO" `
                                                    -PasswordCredentials $key `
                                                    -PublicClient $False
+
+
    $currentAppId = $serviceAadApplication.AppId
    $serviceServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
    Write-Host "Done."
@@ -210,9 +214,9 @@ Function ConfigureApplications
    $servicePortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_IAM/ApplicationBlade/appId/"+$serviceAadApplication.AppId+"/objectId/"+$serviceAadApplication.ObjectId
    Add-Content -Value "<tr><td>service</td><td>$currentAppId</td><td><a href='$servicePortalUrl'>TodoListService-OBO</a></td></tr>" -Path createdApps.html
 
+   $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
    # Add Required Resources Access (from 'service' to 'Microsoft Graph')
    Write-Host "Getting access from 'service' to 'Microsoft Graph'"
-   $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
    $requiredPermissions = GetRequiredPermissions -applicationDisplayName "Microsoft Graph" `
                                                  -requiredDelegatedPermissions "User.Read";
    $requiredResourcesAccess.Add($requiredPermissions)
@@ -223,6 +227,8 @@ Function ConfigureApplications
    $clientAadApplication = New-AzureADApplication -DisplayName "TodoListClient-OBO" `
                                                   -ReplyUrls "https://TodoListClient-OBO" `
                                                   -PublicClient $True
+
+
    $currentAppId = $clientAadApplication.AppId
    $clientServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
    Write-Host "Done."
@@ -231,9 +237,9 @@ Function ConfigureApplications
    $clientPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_IAM/ApplicationBlade/appId/"+$clientAadApplication.AppId+"/objectId/"+$clientAadApplication.ObjectId
    Add-Content -Value "<tr><td>client</td><td>$currentAppId</td><td><a href='$clientPortalUrl'>TodoListClient-OBO</a></td></tr>" -Path createdApps.html
 
+   $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
    # Add Required Resources Access (from 'client' to 'service')
    Write-Host "Getting access from 'client' to 'service'"
-   $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
    $requiredPermissions = GetRequiredPermissions -applicationDisplayName "TodoListService-OBO" `
                                                  -requiredDelegatedPermissions "user_impersonation";
    $requiredResourcesAccess.Add($requiredPermissions)
@@ -247,6 +253,8 @@ Function ConfigureApplications
                                                -IdentifierUris "https://$tenantName/TodoListSPA-OBO" `
                                                -Oauth2AllowImplicitFlow $true `
                                                -PublicClient $False
+
+
    $currentAppId = $spaAadApplication.AppId
    $spaServicePrincipal = New-AzureADServicePrincipal -AppId $currentAppId -Tags {WindowsAzureActiveDirectoryIntegratedApp}
    Write-Host "Done."
@@ -255,9 +263,9 @@ Function ConfigureApplications
    $spaPortalUrl = "https://portal.azure.com/#@"+$tenantName+"/blade/Microsoft_AAD_IAM/ApplicationBlade/appId/"+$spaAadApplication.AppId+"/objectId/"+$spaAadApplication.ObjectId
    Add-Content -Value "<tr><td>spa</td><td>$currentAppId</td><td><a href='$spaPortalUrl'>TodoListSPA-OBO</a></td></tr>" -Path createdApps.html
 
+   $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
    # Add Required Resources Access (from 'spa' to 'service')
    Write-Host "Getting access from 'spa' to 'service'"
-   $requiredResourcesAccess = New-Object System.Collections.Generic.List[Microsoft.Open.AzureAD.Model.RequiredResourceAccess]
    $requiredPermissions = GetRequiredPermissions -applicationDisplayName "TodoListService-OBO" `
                                                  -requiredDelegatedPermissions "user_impersonation";
    $requiredResourcesAccess.Add($requiredPermissions)
