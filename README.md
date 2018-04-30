@@ -208,11 +208,11 @@ This project has two WebApp / Web API projects. To deploy them to Azure Web Site
 ### Create and Publish the `TodoListService-OBO` to an Azure Web Site
 
 1. Sign in to the [Azure portal](https://portal.azure.com).
-2. Click New in the top left-hand corner, select Web + Mobile --> Web App, select the hosting plan and region, and give your web site a name, for example, `TodoListService-OBO-contoso.azurewebsites.net`.  Click Create Web Site.
-3. Once the web site is created, click on it to manage it.  For this set of steps, download the publish profile and save it.  Other deployment mechanisms, such as from source control, can also be used.
-4. Switch to Visual Studio and go to the TodoListService project.  Right click on the project in the Solution Explorer and select Publish.  Click Import, and import the publish profile that you downloaded.
-5. On the Connection tab, update the Destination URL so that it is https, for example [https://TodoListService-OBO-contoso.azurewebsites.net](https://TodoListService-OBO-contoso.azurewebsites.net). Click Next.
-6. On the Settings tab, make sure Enable Organizational Authentication is NOT selected.  Click Publish.
+2. Click **Create a resource** in the top left-hand corner, select **Web + Mobile** --> **Web App**, select the hosting plan and region, and give your web site a name, for example, `TodoListService-OBO-contoso.azurewebsites.net`.  Click Create Web Site.
+3. Once the web site is created, click on it to manage it.  For this set of steps, download the publish profile by clicking **Get publish profile** and save it.  Other deployment mechanisms, such as from source control, can also be used.
+4. Switch to Visual Studio and go to the TodoListService project.  Right click on the project in the Solution Explorer and select **Publish**.  Click **Import Profile** on the bottom bar, and import the publish profile that you downloaded earlier.
+5. Click on **Settings** and in the `Connection tab`, update the Destination URL so that it is https, for example [https://TodoListService-OBO-contoso.azurewebsites.net](https://TodoListService-OBO-contoso.azurewebsites.net). Click Next.
+6. On the Settings tab, make sure `Enable Organizational Authentication` is NOT selected.  Click **Save**. Click on **Publish** on the main screen.
 7. Visual Studio will publish the project and automatically open a browser to the URL of the project.  If you see the default web page of the project, the publication was successful.
 
 ### Update the Active Directory tenant application registration for `TodoListService-OBO`
@@ -220,7 +220,7 @@ This project has two WebApp / Web API projects. To deploy them to Azure Web Site
 1. Navigate to the [Azure portal](https://portal.azure.com).
 2. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant containing the `TodoListService-OBO` application.
 3. On the applications tab, select the `TodoListService-OBO` application.
-4. From the Settings -> Properties and Settings -> Reply URLs menus, update the Sign-On URL, and Reply URL fields to the address of your service, for example [https://TodoListService-OBO-contoso.azurewebsites.net](https://TodoListService-OBO-contoso.azurewebsites.net). Save the configuration.
+4. From the Settings -> Reply URLs menu, update the Sign-On URL, and Reply URL fields to the address of your service, for example [https://TodoListService-OBO-contoso.azurewebsites.net](https://TodoListService-OBO-contoso.azurewebsites.net). Save the configuration.
 
 ### Update the `TodoListClient-OBO` to call the `TodoListService-OBO` Running in Azure Web Sites
 
@@ -239,11 +239,11 @@ This project has two WebApp / Web API projects. To deploy them to Azure Web Site
 ### Create and Publish the `TodoListSPA-OBO` to an Azure Web Site
 
 1. Sign in to the [Azure portal](https://portal.azure.com).
-2. Click New in the top left-hand corner, select Web + Mobile --> Web App, select the hosting plan and region, and give your web site a name, for example, `TodoListSPA-OBO-contoso.azurewebsites.net`.  Click Create Web Site.
-3. Once the web site is created, click on it to manage it.  For this set of steps, download the publish profile and save it.  Other deployment mechanisms, such as from source control, can also be used.
-4. Switch to Visual Studio and go to the TodoListService project.  Right click on the project in the Solution Explorer and select Publish.  Click Import, and import the publish profile that you downloaded.
-5. On the Connection tab, update the Destination URL so that it is https, for example [https://TodoListSPA-OBO-contoso.azurewebsites.net](https://TodoListSPA-OBO-contoso.azurewebsites.net). Click Next.
-6. On the Settings tab, make sure Enable Organizational Authentication is NOT selected.  Click Publish.
+2. Click **Create a resource** in the top left-hand corner, select **Web + Mobile** --> **Web App**, select the hosting plan and region, and give your web site a name, for example, `TodoListSPA-OBO-contoso.azurewebsites.net`.  Click Create Web Site.
+3. Once the web site is created, click on it to manage it.  For this set of steps, download the publish profile by clicking **Get publish profile** and save it.  Other deployment mechanisms, such as from source control, can also be used.
+4. Switch to Visual Studio and go to the TodoListService project.  Right click on the project in the Solution Explorer and select **Publish**.  Click **Import Profile** on the bottom bar, and import the publish profile that you downloaded earlier.
+5. Click on **Settings** and in the `Connection tab`, update the Destination URL so that it is https, for example [https://TodoListSPA-OBO-contoso.azurewebsites.net](https://TodoListSPA-OBO-contoso.azurewebsites.net). Click Next.
+6. On the Settings tab, make sure `Enable Organizational Authentication` is NOT selected.  Click **Save**. Click on **Publish** on the main screen.
 7. Visual Studio will publish the project and automatically open a browser to the URL of the project.  If you see the default web page of the project, the publication was successful.
 
 ### Update the Active Directory tenant application registration for `TodoListSPA-OBO`
@@ -251,7 +251,7 @@ This project has two WebApp / Web API projects. To deploy them to Azure Web Site
 1. Navigate to the [Azure portal](https://portal.azure.com).
 2. On the top bar, click on your account and under the **Directory** list, choose the Active Directory tenant containing the `TodoListSPA-OBO` application.
 3. On the applications tab, select the `TodoListSPA-OBO` application.
-4. From the Settings -> Properties and Settings -> Reply URLs menus, update the Sign-On URL, and Reply URL fields to the address of your service, for example [https://TodoListSPA-OBO-contoso.azurewebsites.net](https://TodoListSPA-OBO-contoso.azurewebsites.net). Save the configuration.
+4. From the Settings -> Reply URLs menu, update the Sign-On URL, and Reply URL fields to the address of your service, for example [https://TodoListSPA-OBO-contoso.azurewebsites.net](https://TodoListSPA-OBO-contoso.azurewebsites.net). Save the configuration.
 
 ## How To Recreate This Sample
 
