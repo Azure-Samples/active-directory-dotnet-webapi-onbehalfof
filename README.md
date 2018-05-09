@@ -196,7 +196,7 @@ The code for the Token cache serialization on the client side (in a file) is in 
 
 The code acquiring a token on behalf of the user from the service side is in [TodoListService/Controllers/TodoListController.cs](TodoListService/Controllers/TodoListController.cs)
 
-The code for the Service side serialization (in a database) is in [TodoListService/DAL/DbTokenCache.cs](TodoListService/DAL/DbTokenCache.cs) in the `CallGraphAPIOnBehalfOfUser()` method.
+The code for the Service side serialization (in a database) is in [TodoListService/DAL/DbTokenCache.cs](TodoListService/DAL/DbTokenCache.cs). you can see how it's referenced by the Controller in the [CallGraphAPIOnBehalfOfUser()](https://github.com/Azure-Samples/active-directory-dotnet-webapi-onbehalfof/blob/49ddb0a47018db1d1cc2c397341bdc2331bcb502/TodoListService/Controllers/TodoListController.cs#L154) method.
 
 ## How to deploy this sample to Azure
 
