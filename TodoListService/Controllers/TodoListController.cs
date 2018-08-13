@@ -130,7 +130,7 @@ namespace TodoListService.Controllers
             }
         }
 
-        public static async Task<UserProfile> CallGraphAPIOnBehalfOfUser()
+        private static async Task<UserProfile> CallGraphAPIOnBehalfOfUser()
         {
             UserProfile profile = null;
             string accessToken = null;

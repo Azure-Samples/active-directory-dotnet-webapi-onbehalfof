@@ -32,6 +32,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Windows;
 
@@ -75,14 +76,15 @@ namespace TodoListClient
             InitializeComponent();
             authContext = new AuthenticationContext(authority, new FileCache());
             GetTodoList();
+
         }
 
-        private void GetTodoList()
+        private async void GetTodoList()
         {
-            GetTodoList(SignInButton.Content.ToString() != clearCacheString);
+            await GetTodoListAsync(SignInButton.Content.ToString() != clearCacheString);
         }
 
-        private async void GetTodoList(bool isAppStarting)
+        private async Task GetTodoListAsync(bool isAppStarting)
         {
             //
             // Get an access token to call the To Do service.
@@ -146,6 +148,11 @@ namespace TodoListClient
         }
 
         private async void AddTodoItem(object sender, RoutedEventArgs e)
+        {
+            await AddTodoItemAsync();
+        }
+
+        private async Task AddTodoItemAsync()
         {
             if (string.IsNullOrEmpty(TodoText.Text))
             {
